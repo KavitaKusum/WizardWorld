@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.wizardworld.ui.home.fragment.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_ProductsListFragment"
+            app:destination="@id/productListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productListFragment"
+        android:name="com.example.wizardworld.ui.home.fragment.ProductListFragment"
+        android:label="ProductListFragment"
+        tools:layout="@layout/fragment_wizards">
+    <action
+        android:id="@+id/action_to_WizardDetailsFragment"
+        app:destination="@id/wizardDetailsFragment"
+        app:popUpTo="@id/wizardDetailsFragment"
+        app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_to_HouseDetailsFragment"
+            app:destination="@id/houseDetailsFragment"
+            app:popUpTo="@id/houseDetailsFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_to_SpellDetailsFragment"
+            app:destination="@id/spellDetailsFragment"
+            app:popUpTo="@id/spellDetailsFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_to_ElixirDetailsFragment"
+            app:destination="@id/elixirDetailsFragment"
+            app:popUpTo="@id/elixirDetailsFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/wizardDetailsFragment"
+        android:name="com.example.wizardworld.ui.home.fragment.WizardDetailsFragment"
+        android:label="WizardDetailsFragment"
+        tools:layout="@layout/fragment_wizard_details"/>
+
+    <fragment
+        android:id="@+id/houseDetailsFragment"
+        android:name="com.example.wizardworld.ui.home.fragment.HouseDetailsFragment"
+        android:label="HouseDetailsFragment"
+        tools:layout="@layout/fragment_house_details"/>
+
+    <fragment
+        android:id="@+id/spellDetailsFragment"
+        android:name="com.example.wizardworld.ui.home.fragment.SpellDetailsFragment"
+        android:label="SpellDetailsFragment"
+        tools:layout="@layout/fragment_spell_details"/>
+    <fragment
+        android:id="@+id/elixirDetailsFragment"
+        android:name="com.example.wizardworld.ui.home.fragment.ElixirDetailsFragment"
+        android:label="ElixirDetailsFragment"
+        tools:layout="@layout/fragment_elixir_details"/>
+</navigation>
