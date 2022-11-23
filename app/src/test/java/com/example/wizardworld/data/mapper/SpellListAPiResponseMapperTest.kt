@@ -1,5 +1,6 @@
 package com.example.wizardworld.data.mapper
 
+import com.example.wizardworld.data.*
 import com.example.wizardworld.data.dto.SpellDTO
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -7,29 +8,30 @@ import junit.framework.TestCase
 
 class SpellListAPiResponseMapperTest : TestCase() {
 
-    private lateinit var mapper:SpellListAPiResponseMapper
+    private lateinit var mapper: SpellListAPiResponseMapper
     public override fun setUp() {
         super.setUp()
-        mapper= SpellListAPiResponseMapper()
+        mapper = SpellListAPiResponseMapper()
     }
+
     fun testToSpellList() {
-        assertEquals(mapper.toSpellList(listOf(getSpellDTO()))[0].name,"Kavita")
+        assertEquals(mapper.toSpellList(listOf(getSpellDTO()))[0].name, spell)
     }
 
     fun testToSpell() {
-        assertEquals(mapper.toSpell(getSpellDTO()).creator,"creator")
+        assertEquals(mapper.toSpell(getSpellDTO()).creator, creator)
     }
 
     private fun getSpellDTO(): SpellDTO {
-        val spell = mockk<SpellDTO>()
-        coEvery{spell.name} returns "Kavita"
-        coEvery{spell.canBeVerbal} returns "yes"
-        coEvery{spell.id} returns "1"
-        coEvery{spell.creator} returns "creator"
-        coEvery{spell.effect} returns "effect"
-        coEvery{spell.incantation} returns "incantation"
-        coEvery{spell.light} returns "light"
-        coEvery{spell.type} returns "type"
-        return spell
+        val spellObj = mockk<SpellDTO>()
+        coEvery { spellObj.name } returns spell
+        coEvery { spellObj.incantation } returns incantation
+        coEvery { spellObj.id } returns id
+        coEvery { spellObj.effect } returns effect
+        coEvery { spellObj.canBeVerbal } returns ""
+        coEvery { spellObj.type } returns ""
+        coEvery { spellObj.light } returns ""
+        coEvery { spellObj.creator } returns creator
+        return spellObj
     }
 }

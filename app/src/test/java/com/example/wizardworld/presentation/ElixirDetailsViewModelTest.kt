@@ -1,11 +1,10 @@
 package com.example.wizardworld.presentation
 
-import android.content.Context
-import com.example.wizardworld.R
+import com.example.wizardworld.data.elixir
+import com.example.wizardworld.data.errorString
+import com.example.wizardworld.data.id
 import com.example.wizardworld.domain.Result
 import com.example.wizardworld.domain.model.Elixir
-import com.example.wizardworld.domain.model.Ingredient
-import com.example.wizardworld.domain.model.Inventor
 import com.example.wizardworld.domain.usecase.ElixirDetailUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -35,7 +34,7 @@ class ElixirDetailsViewModelTest : TestCase() {
         super.setUp()
         MockKAnnotations.init(this)
         Dispatchers.setMain(StandardTestDispatcher())
-        viewModel= ElixirDetailsViewModel(elixirDetailUseCase)
+        viewModel = ElixirDetailsViewModel(elixirDetailUseCase)
     }
 
     public override fun tearDown() {
@@ -45,47 +44,29 @@ class ElixirDetailsViewModelTest : TestCase() {
 
     fun testGetElixirDetailsSuccess() {
         runTest {
-            val id= "1"
-            coEvery{elixirDetailUseCase.invoke(id)} returns(flow {
-                val elixir= mockk<Elixir>()
-                coEvery{elixir.name} returns "Elixir"
-                emit(Result.Success(elixir))
+            coEvery { elixirDetailUseCase.invoke(id) } returns (flow {
+                val elixirObj = mockk<Elixir>()
+                coEvery { elixirObj.name } returns elixir
+                emit(Result.Success(elixirObj))
             })
             viewModel.getElixirDetails(id)
         }
-        assertEquals("Elixir",viewModel.viewState.value.data?.name)
+        assertEquals(elixir, viewModel.viewState.value.data?.name)
     }
 
     fun testGetElixirDetailsError() {
         runTest {
-            val id="1"
-            coEvery{elixirDetailUseCase.invoke("1")} returns(flow { emit(Result.Error("Error")) })
+            coEvery { elixirDetailUseCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getElixirDetails(id)
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetElixirDetailsLoading() {
         runTest {
-            coEvery{elixirDetailUseCase.invoke("1")} returns(flow { emit(Result.Loading()) })
-            viewModel.getElixirDetails("1")
+            coEvery { elixirDetailUseCase.invoke(id) } returns (flow { emit(Result.Loading()) })
+            viewModel.getElixirDetails(id)
         }
         assertTrue(viewModel.viewState.value.isLoading)
-    }
-
-    fun testGetIngredientsList() {
-        val context = mockk<Context>()
-        coEvery{context.getString(R.string.none)} returns "none"
-        val ingredient= mockk<Ingredient>()
-        coEvery{ingredient.id} returns "1"
-        coEvery{ingredient.name} returns "Ingredient"
-        assertEquals(viewModel.getIngredientsList(listOf(ingredient))[0],"Ingredient")
-    }
-
-    fun testGetInventorsList() {
-        val inventor= mockk<Inventor>()
-        coEvery{inventor.name} returns "Kavita"
-        coEvery{inventor.id} returns "1"
-        assertEquals(viewModel.getInventorsList(listOf(inventor))[0],"Kavita")
     }
 }

@@ -2,4 +2,4 @@ package com.example.wizardworld.domain.model
 
 import androidx.annotation.DrawableRes
 
-class Product(var productId: Int, @DrawableRes   var image: Int, var description: String)
+class Product(val productId: Int, @DrawableRes val image: Int, val description: String)

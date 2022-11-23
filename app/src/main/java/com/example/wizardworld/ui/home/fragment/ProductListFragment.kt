@@ -22,10 +22,10 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProductListFragment : Fragment() {
-
+    private val identifier = "productId"
     private lateinit var binding: FragmentWizardsBinding
     private val viewModel: ProductListViewModel by viewModels()
-    private val productListAdapter by lazy{ ProductListAdapter() }
+    private val productListAdapter by lazy { ProductListAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,61 +34,76 @@ class ProductListFragment : Fragment() {
         (requireActivity() as HomeActivity).binding.imgBack.isVisible = true
         var choice: Int
         arguments.let {
-            choice= it?.getInt("position") ?: 0
+            choice = it?.getInt("position") ?: 0
         }
         binding = FragmentWizardsBinding.inflate(layoutInflater)
-        binding.wizardsRecyclerView.apply {
-            val linearLayoutManager = LinearLayoutManager(context)
-            layoutManager = linearLayoutManager
+        with(binding.wizardsRecyclerView) {
+            layoutManager = LinearLayoutManager(context)
             productListAdapter.onClickListener = object :
                 ProductListAdapter.OnClickListener {
                 override fun onClick(productId: String) {
-                    when(choice){
-                        1->findNavController().navigate(R.id.action_to_WizardDetailsFragment, bundleOf("productId" to productId))
-                        2->findNavController().navigate(R.id.action_to_HouseDetailsFragment, bundleOf("productId" to productId))
-                        3->findNavController().navigate(R.id.action_to_ElixirDetailsFragment, bundleOf("productId" to productId))
-                        4->findNavController().navigate(R.id.action_to_SpellDetailsFragment, bundleOf("productId" to productId))
+                    when (choice) {
+                        1 -> findNavController().navigate(
+                            R.id.action_to_WizardDetailsFragment,
+                            bundleOf(identifier to productId)
+                        )
+                        2 -> findNavController().navigate(
+                            R.id.action_to_HouseDetailsFragment,
+                            bundleOf(identifier to productId)
+                        )
+                        3 -> findNavController().navigate(
+                            R.id.action_to_ElixirDetailsFragment,
+                            bundleOf(identifier to productId)
+                        )
+                        4 -> findNavController().navigate(
+                            R.id.action_to_SpellDetailsFragment,
+                            bundleOf(identifier to productId)
+                        )
                     }
                 }
             }
             adapter = productListAdapter
         }
-        viewModel.getProductList(choice,requireContext())
+        viewModel.getProductList(choice, requireContext())
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if(viewState.isLoading) showLoading()
+                if (viewState.isLoading) showLoading()
                 viewState.error?.let {
                     hideLoading()
-                    Toast.makeText(requireContext(), getString(R.string.error_text, viewState.error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_text, viewState.error),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 viewState.data?.let {
                     hideLoading()
-                    setViews(choice,it)
+                    setViews(choice, it)
                 }
             }
         }
         return binding.root
     }
 
-    private fun setViews(choice:Int,data: List<Triple<String, String, String>>) {
+    private fun setViews(choice: Int, data: List<Triple<String, String, String>>) {
         hideLoading()
         productListAdapter.differ.submitList(data)
-        binding.heading.text = viewModel.getHeadingText(choice,requireContext())
+        binding.heading.text = viewModel.getHeadingText(choice, requireContext())
     }
 
     private fun showLoading() {
         with(binding) {
             progressBar.isVisible = true
-            heading.isVisible=false
-            wizardsRecyclerView.isVisible=false
+            heading.isVisible = false
+            wizardsRecyclerView.isVisible = false
         }
     }
 
     private fun hideLoading() {
         with(binding) {
             progressBar.isVisible = false
-            heading.isVisible=true
-            wizardsRecyclerView.isVisible=true
+            heading.isVisible = true
+            wizardsRecyclerView.isVisible = true
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.example.wizardworld.presentation
 
+import com.example.wizardworld.data.errorString
+import com.example.wizardworld.data.id
+import com.example.wizardworld.data.spell
 import com.example.wizardworld.domain.Result
 import com.example.wizardworld.domain.model.Spell
 import com.example.wizardworld.domain.usecase.SpellDetailsUseCase
@@ -30,7 +33,7 @@ class SpellDetailsViewModelTest : TestCase() {
         super.setUp()
         MockKAnnotations.init(this)
         Dispatchers.setMain(StandardTestDispatcher())
-        viewModel= SpellDetailsViewModel(useCase)
+        viewModel = SpellDetailsViewModel(useCase)
     }
 
     public override fun tearDown() {
@@ -40,28 +43,28 @@ class SpellDetailsViewModelTest : TestCase() {
 
     fun testGetSpellDetailsSuccess() {
         runTest {
-            coEvery{useCase.invoke("1")} returns(flow {
-                val spell= mockk<Spell>()
-                coEvery{spell.name} returns "Spell"
-                emit(Result.Success(spell))
+            coEvery { useCase.invoke(id) } returns (flow {
+                val spellObj = mockk<Spell>()
+                coEvery { spellObj.name } returns spell
+                emit(Result.Success(spellObj))
             })
-            viewModel.getSpellDetails("1")
+            viewModel.getSpellDetails(id)
         }
-        assertEquals("Spell",viewModel.viewState.value.data?.name)
+        assertEquals(spell, viewModel.viewState.value.data?.name)
     }
 
     fun testGetSpellDetailsError() {
         runTest {
-            coEvery{useCase.invoke("1")} returns(flow { emit(Result.Error("Error")) })
-            viewModel.getSpellDetails("1")
+            coEvery { useCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
+            viewModel.getSpellDetails(id)
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetSpellDetailsLoading() {
         runTest {
-            coEvery{useCase.invoke("1")} returns(flow { emit(Result.Loading()) })
-            viewModel.getSpellDetails("1")
+            coEvery { useCase.invoke(id) } returns (flow { emit(Result.Loading()) })
+            viewModel.getSpellDetails(id)
         }
         assertTrue(viewModel.viewState.value.isLoading)
     }

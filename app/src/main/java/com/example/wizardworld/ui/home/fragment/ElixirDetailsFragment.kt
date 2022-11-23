@@ -19,11 +19,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ElixirDetailsFragment : Fragment(){
+class ElixirDetailsFragment : Fragment() {
+    private val productId = "productId"
     private lateinit var binding: FragmentElixirDetailsBinding
     private val viewModel: ElixirDetailsViewModel by viewModels()
-    private val ingredientsAdapter by lazy{ DetailsAdapter() }
-    private val inventorsAdapter by lazy{ DetailsAdapter() }
+    private val ingredientsAdapter by lazy { DetailsAdapter() }
+    private val inventorsAdapter by lazy { DetailsAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,14 +34,18 @@ class ElixirDetailsFragment : Fragment(){
         setIngredientsView()
         setInventorsView()
         arguments.let {
-            viewModel.getElixirDetails(it?.getString("productId")?:"" )
+            viewModel.getElixirDetails(it?.getString(productId) ?: "")
         }
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if(viewState.isLoading) showLoading()
+                if (viewState.isLoading) showLoading()
                 viewState.error?.let {
                     hideLoading()
-                    Toast.makeText(requireContext(), getString(R.string.error_text, viewState.error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_text, viewState.error),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 viewState.data?.let {
                     hideLoading()
@@ -53,55 +58,53 @@ class ElixirDetailsFragment : Fragment(){
 
     private fun setViews(data: Elixir) {
         with(binding) {
-            heading.text=getString(R.string.elixir_details)
-            elixirName.text= getString(R.string.name, data.name)
-            elixirEffect.text= getString(R.string.effect,data.effect)
-            elixirSideEffect.text= getString(R.string.side_effect, data.sideEffects)
-            elixirCharacteristics.text= getString(R.string.characteristics,data.characteristics)
-            elixirDifficulty.text= getString(R.string.difficulty, data.difficulty)
-            elixirManufacturer.text= getString(R.string.manufacturer, data.manufacturer)
-            elixirTime.text= getString(R.string.time, data.time)
-            if( data.ingredients.isEmpty())
-                ingredientsRv.isVisible=false
+            heading.text = getString(R.string.elixir_details)
+            elixirName.text = getString(R.string.name, data.name)
+            elixirEffect.text = getString(R.string.effect, data.effect)
+            elixirSideEffect.text = getString(R.string.side_effect, data.sideEffects)
+            elixirCharacteristics.text = getString(R.string.characteristics, data.characteristics)
+            elixirDifficulty.text = getString(R.string.difficulty, data.difficulty)
+            elixirManufacturer.text = getString(R.string.manufacturer, data.manufacturer)
+            elixirTime.text = getString(R.string.time, data.time)
+            if (data.ingredients.isEmpty())
+                ingredientsRv.isVisible = false
             else {
-                ingredientsAdapter.differ.submitList(viewModel.getIngredientsList(data.ingredients))
-                ingredientsLabel.text=getString(R.string.inventors)
+                ingredientsAdapter.differ.submitList(data.ingredients)
+                ingredientsLabel.text = getString(R.string.inventors)
             }
-            if( data.inventors.isEmpty())
-                inventorsRv.isVisible=false
+            if (data.inventors.isEmpty())
+                inventorsRv.isVisible = false
             else {
-                inventorsAdapter.differ.submitList(viewModel.getInventorsList( data.inventors))
-                inventorsLabel.text=getString(R.string.ingredients)
+                ingredientsAdapter.differ.submitList(data.inventors)
+                inventorsLabel.text = getString(R.string.ingredients)
             }
         }
     }
 
     private fun showLoading() {
-        with(binding){
+        with(binding) {
             progressBar.isVisible = true
-            detail.isVisible=false
+            detail.isVisible = false
         }
     }
 
     private fun hideLoading() {
-        with(binding){
+        with(binding) {
             progressBar.isVisible = false
-            detail.isVisible=true
+            detail.isVisible = true
         }
     }
 
     private fun setIngredientsView() {
-        binding.ingredientsRv.apply {
-            val linearLayoutManager = LinearLayoutManager(context)
-            layoutManager = linearLayoutManager
+        with(binding.ingredientsRv) {
+            layoutManager = LinearLayoutManager(context)
             adapter = ingredientsAdapter
         }
     }
 
     private fun setInventorsView() {
-        binding.inventorsRv.apply {
-            val linearLayoutManager = LinearLayoutManager(context)
-            layoutManager = linearLayoutManager
+        with(binding.inventorsRv) {
+            layoutManager = LinearLayoutManager(context)
             adapter = inventorsAdapter
         }
     }

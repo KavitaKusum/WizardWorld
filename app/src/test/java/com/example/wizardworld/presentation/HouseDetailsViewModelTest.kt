@@ -1,11 +1,10 @@
 package com.example.wizardworld.presentation
 
-import android.content.Context
-import com.example.wizardworld.R
+import com.example.wizardworld.data.errorString
+import com.example.wizardworld.data.house
+import com.example.wizardworld.data.id
 import com.example.wizardworld.domain.Result
-import com.example.wizardworld.domain.model.Heads
 import com.example.wizardworld.domain.model.House
-import com.example.wizardworld.domain.model.Traits
 import com.example.wizardworld.domain.usecase.HouseDetailUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -35,7 +34,7 @@ class HouseDetailsViewModelTest : TestCase() {
         super.setUp()
         MockKAnnotations.init(this)
         Dispatchers.setMain(StandardTestDispatcher())
-        viewModel= HouseDetailsViewModel(houseDetailUseCase)
+        viewModel = HouseDetailsViewModel(houseDetailUseCase)
     }
 
     public override fun tearDown() {
@@ -45,47 +44,29 @@ class HouseDetailsViewModelTest : TestCase() {
 
     fun testGetHouseDetailsSuccess() {
         runTest {
-            coEvery{houseDetailUseCase.invoke("1")} returns(flow {
-                val house= mockk<House>()
-                coEvery{house.name} returns "House"
-                emit(Result.Success(house))
+            coEvery { houseDetailUseCase.invoke(id) } returns (flow {
+                val houseObj = mockk<House>()
+                coEvery { houseObj.name } returns house
+                emit(Result.Success(houseObj))
             })
-            viewModel.getHouseDetails("1")
+            viewModel.getHouseDetails(id)
         }
-        assertEquals("House",viewModel.viewState.value.data?.name)
+        assertEquals(house, viewModel.viewState.value.data?.name)
     }
 
     fun testGetHouseDetailsError() {
         runTest {
-            coEvery{houseDetailUseCase.invoke("1")} returns(flow { emit(Result.Error("Error") )})
-            viewModel.getHouseDetails("1")
+            coEvery { houseDetailUseCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
+            viewModel.getHouseDetails(id)
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetHouseDetailsLoading() {
         runTest {
-            coEvery{houseDetailUseCase.invoke("1")} returns(flow { emit(Result.Loading()) })
-            viewModel.getHouseDetails("1")
+            coEvery { houseDetailUseCase.invoke(id) } returns (flow { emit(Result.Loading()) })
+            viewModel.getHouseDetails(id)
         }
         assertTrue(viewModel.viewState.value.isLoading)
-    }
-
-    fun testGetTraitsList() {
-        val context = mockk<Context>()
-        coEvery{context.getString(R.string.no_traits)} returns "none"
-        val trait= mockk<Traits>()
-        coEvery{trait.id} returns "1"
-        coEvery{trait.name} returns "Trait"
-        assertEquals(viewModel.getTraitsList(listOf(trait))[0],"Trait")
-    }
-
-    fun testGetHeadsList() {
-        val context = mockk<Context>()
-        coEvery{context.getString(R.string.none)} returns "none"
-        val head= mockk<Heads>()
-        coEvery{head.id} returns "1"
-        coEvery{head.name} returns "Kavita Kusum"
-        assertEquals(viewModel.getHeadsList(listOf(head))[0],"Kavita Kusum")
     }
 }

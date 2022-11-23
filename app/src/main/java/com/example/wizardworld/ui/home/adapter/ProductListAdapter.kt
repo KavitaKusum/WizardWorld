@@ -8,22 +8,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wizardworld.databinding.WizardListItemBinding
 
 class ProductListAdapter :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<ProductListItemViewHolder>() {
 
     lateinit var onClickListener: OnClickListener
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductListItemViewHolder {
         return ProductListItemViewHolder(
             WizardListItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            ),onClickListener
+            ), onClickListener
         )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as ProductListItemViewHolder).bind(differ.currentList[position])
+    override fun onBindViewHolder(holder: ProductListItemViewHolder, position: Int) {
+        holder.bind(differ.currentList[position])
         holder.setIsRecyclable(true)
     }
 
@@ -33,16 +33,22 @@ class ProductListAdapter :
         fun onClick(productId: String)
     }
 
-    private val differCallback = object : DiffUtil.ItemCallback<Triple<String, String, String>>(){
-        override fun areItemsTheSame(oldItem: Triple<String, String, String>, newItem: Triple<String, String, String>): Boolean {
-            return  oldItem == newItem
+    private val differCallback = object : DiffUtil.ItemCallback<Triple<String, String, String>>() {
+        override fun areItemsTheSame(
+            oldItem: Triple<String, String, String>,
+            newItem: Triple<String, String, String>
+        ): Boolean {
+            return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: Triple<String, String, String>, newItem: Triple<String, String, String>): Boolean {
+        override fun areContentsTheSame(
+            oldItem: Triple<String, String, String>,
+            newItem: Triple<String, String, String>
+        ): Boolean {
             return oldItem == newItem
         }
 
     }
 
-    val differ = AsyncListDiffer(this,differCallback)
+    val differ = AsyncListDiffer(this, differCallback)
 }

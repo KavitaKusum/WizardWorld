@@ -1,4 +1,3 @@
-
 package com.example.wizardworld.ui.home.fragment
 
 import android.os.Bundle
@@ -20,11 +19,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HouseDetailsFragment : Fragment(){
+class HouseDetailsFragment : Fragment() {
+    private val productId = "productId"
     private lateinit var binding: FragmentHouseDetailsBinding
     private val viewModel: HouseDetailsViewModel by viewModels()
-    private val headsAdapter by lazy{ DetailsAdapter() }
-    private val traitsAdapter by lazy{ DetailsAdapter() }
+    private val headsAdapter by lazy { DetailsAdapter() }
+    private val traitsAdapter by lazy { DetailsAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,14 +34,18 @@ class HouseDetailsFragment : Fragment(){
         setHeadsView()
         setTraitsView()
         arguments.let {
-            viewModel.getHouseDetails(it?.getString("productId")?:"" )
+            viewModel.getHouseDetails(it?.getString(productId) ?: "")
         }
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if(viewState.isLoading) showLoading()
+                if (viewState.isLoading) showLoading()
                 viewState.error?.let {
                     hideLoading()
-                    Toast.makeText(requireContext(), getString(R.string.error_text, viewState.error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_text, viewState.error),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 viewState.data?.let {
                     hideLoading()
@@ -54,55 +58,53 @@ class HouseDetailsFragment : Fragment(){
 
     private fun setViews(data: House) {
         with(binding) {
-            heading.text=getString(R.string.house_details)
-            houseName.text= getString(R.string.name,data.name)
-            houseColor.text= getString(R.string.color,data.houseColours)
-            houseFounder.text= getString(R.string.founder,data.founder)
-            houseAnimal.text= getString(R.string.animal,data.animal)
-            houseElement.text= getString(R.string.element,data.element)
-            houseGhost.text= getString(R.string.ghost,data.ghost)
-            houseCommonroom.text= getString(R.string.commonroom,data.commonRoom)
-            if( data.heads.isEmpty())
-                headsRv.isVisible=false
+            heading.text = getString(R.string.house_details)
+            houseName.text = getString(R.string.name, data.name)
+            houseColor.text = getString(R.string.color, data.houseColours)
+            houseFounder.text = getString(R.string.founder, data.founder)
+            houseAnimal.text = getString(R.string.animal, data.animal)
+            houseElement.text = getString(R.string.element, data.element)
+            houseGhost.text = getString(R.string.ghost, data.ghost)
+            houseCommonroom.text = getString(R.string.commonroom, data.commonRoom)
+            if (data.heads.isEmpty())
+                headsRv.isVisible = false
             else {
-                headsAdapter.differ.submitList(viewModel.getHeadsList( data.heads))
-                headsLabel.text=getString(R.string.heads)
+                headsAdapter.differ.submitList(data.heads)
+                headsLabel.text = getString(R.string.heads)
             }
-            if( data.traits.isEmpty())
-                traitsRv.isVisible=false
+            if (data.traits.isEmpty())
+                traitsRv.isVisible = false
             else {
-                traitsAdapter.differ.submitList(viewModel.getTraitsList(data.traits))
-                traitsLabel.text=getString(R.string.traits)
+                traitsAdapter.differ.submitList(data.traits)
+                traitsLabel.text = getString(R.string.traits)
             }
         }
     }
 
     private fun hideLoading() {
-        with(binding){
+        with(binding) {
             progressBar.isVisible = false
-            detail.isVisible=true
+            detail.isVisible = true
         }
     }
 
     private fun showLoading() {
-        with(binding){
+        with(binding) {
             progressBar.isVisible = true
-            detail.isVisible=false
+            detail.isVisible = false
         }
     }
 
     private fun setTraitsView() {
-        binding.traitsRv.apply {
-            val linearLayoutManager = LinearLayoutManager(context)
-            layoutManager = linearLayoutManager
+        with(binding.traitsRv) {
+            layoutManager = LinearLayoutManager(context)
             adapter = traitsAdapter
         }
     }
 
     private fun setHeadsView() {
-        binding.headsRv.apply {
-            val linearLayoutManager = LinearLayoutManager(context)
-            layoutManager = linearLayoutManager
+        with(binding.headsRv) {
+            layoutManager = LinearLayoutManager(context)
             adapter = headsAdapter
         }
     }

@@ -1,8 +1,10 @@
 package com.example.wizardworld.domain.model
 
 
-data class Wizard ( var name: String="",
-                    var id:String="",
-                    var elixirs:List<Elixir>)
+data class Wizard(
+    val name: String,
+    val id: String,
+    val elixirs: List<String>
+)
 
 

@@ -17,7 +17,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SpellDetailsFragment: Fragment(){
+class SpellDetailsFragment : Fragment() {
+    private val productId = "productId"
     private lateinit var binding: FragmentSpellDetailsBinding
     private val viewModel: SpellDetailsViewModel by viewModels()
 
@@ -27,14 +28,18 @@ class SpellDetailsFragment: Fragment(){
     ): View {
         binding = FragmentSpellDetailsBinding.inflate(layoutInflater)
         arguments.let {
-            viewModel.getSpellDetails(it?.getString("productId")?:"" )
+            viewModel.getSpellDetails(it?.getString(productId) ?: "")
         }
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if(viewState.isLoading) showLoading()
+                if (viewState.isLoading) showLoading()
                 viewState.error?.let {
                     hideLoading()
-                    Toast.makeText(requireContext(), getString(R.string.error_text, viewState.error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_text, viewState.error),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 viewState.data?.let {
                     hideLoading()
@@ -47,28 +52,28 @@ class SpellDetailsFragment: Fragment(){
 
     private fun setViews(data: Spell) {
         with(binding) {
-            heading.text=getString(R.string.spell_details)
-            name.text= getString(R.string.name, data.name)
-            isverbal.text= getString(R.string.canbeverbal, data.canBeVerbal)
-            creator.text= getString(R.string.creator, data.creator)
-            effect.text= getString(R.string.effect, data.effect)
-            incantation.text= getString(R.string.incantation, data.incantation)
-            light.text= getString(R.string.light, data.light)
-            type.text= getString(R.string.type, data.type)
+            heading.text = getString(R.string.spell_details)
+            name.text = getString(R.string.name, data.name)
+            isverbal.text = getString(R.string.canbeverbal, data.canBeVerbal)
+            creator.text = getString(R.string.creator, data.creator)
+            effect.text = getString(R.string.effect, data.effect)
+            incantation.text = getString(R.string.incantation, data.incantation)
+            light.text = getString(R.string.light, data.light)
+            type.text = getString(R.string.type, data.type)
         }
     }
 
     private fun showLoading() {
-        with(binding){
+        with(binding) {
             progressBar.isVisible = true
-            detail.isVisible=false
+            detail.isVisible = false
         }
     }
 
     private fun hideLoading() {
-        with(binding){
+        with(binding) {
             progressBar.isVisible = false
-            detail.isVisible=true
+            detail.isVisible = true
         }
     }
 }

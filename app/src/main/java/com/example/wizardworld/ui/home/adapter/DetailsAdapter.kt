@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wizardworld.databinding.DetailListItemBinding
 
-class DetailsAdapter:
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+class DetailsAdapter :
+    RecyclerView.Adapter<DetailItemViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailItemViewHolder {
         return DetailItemViewHolder(
             DetailListItemBinding.inflate(
                 LayoutInflater.from(parent.context),
@@ -19,22 +19,21 @@ class DetailsAdapter:
         )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as DetailItemViewHolder).bind(differ.currentList[position])
+    override fun onBindViewHolder(holder: DetailItemViewHolder, position: Int) {
+        holder.bind(differ.currentList[position])
         holder.setIsRecyclable(true)
     }
 
     override fun getItemCount(): Int = differ.currentList.size
-    private val differCallback = object : DiffUtil.ItemCallback<String>(){
+    private val differCallback = object : DiffUtil.ItemCallback<String>() {
         override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-            return  oldItem == newItem
+            return oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
             return oldItem == newItem
         }
-
     }
 
-    val differ = AsyncListDiffer(this,differCallback)
+    val differ = AsyncListDiffer(this, differCallback)
 }

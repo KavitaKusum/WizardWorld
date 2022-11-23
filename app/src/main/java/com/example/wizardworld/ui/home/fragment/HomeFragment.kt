@@ -19,11 +19,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment @Inject constructor(): Fragment() {
+class HomeFragment @Inject constructor() : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
-    private val productAdapter by lazy{ ProductAdapter() }
+    private val productAdapter by lazy { ProductAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,17 +36,18 @@ class HomeFragment @Inject constructor(): Fragment() {
 
     private fun setViews() {
         (requireActivity() as HomeActivity).binding.imgBack.isVisible = false
-        binding.productsRecyclerView.apply {
-            val gridLayoutManager = GridLayoutManager(context, 2)
-            layoutManager = gridLayoutManager
+        with(binding.productsRecyclerView) {
+            layoutManager = GridLayoutManager(context, 2)
             productAdapter.onClickListener = object : ProductAdapter.OnClickListener {
                 override fun onClick(productId: Int) {
-                    findNavController().navigate(R.id.action_home_to_ProductsListFragment, bundleOf("position" to productId))
+                    findNavController().navigate(
+                        R.id.action_home_to_ProductsListFragment,
+                        bundleOf("position" to productId)
+                    )
                 }
             }
             adapter = productAdapter
         }
         productAdapter.differ.submitList(viewModel.getProductList(requireContext()))
-        //productAdapter.setData(viewModel.getProductList(requireContext()))
     }
 }

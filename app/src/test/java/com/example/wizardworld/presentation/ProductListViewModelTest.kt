@@ -2,8 +2,12 @@ package com.example.wizardworld.presentation
 
 import android.content.Context
 import com.example.wizardworld.R
+import com.example.wizardworld.data.*
 import com.example.wizardworld.domain.Result
-import com.example.wizardworld.domain.model.*
+import com.example.wizardworld.domain.model.Elixir
+import com.example.wizardworld.domain.model.House
+import com.example.wizardworld.domain.model.Spell
+import com.example.wizardworld.domain.model.Wizard
 import com.example.wizardworld.domain.usecase.ElixirListUseCase
 import com.example.wizardworld.domain.usecase.HouseListUseCase
 import com.example.wizardworld.domain.usecase.SpellListUseCase
@@ -60,26 +64,26 @@ class ProductListViewModelTest : TestCase() {
 
     fun testGetHeadingText1() {
         val context = mockk<Context>()
-        coEvery{context.getString(R.string.wizards_list)} returns "Wizard"
-        assertEquals("Wizard", viewModel.getHeadingText(1, context))
+        coEvery { context.getString(R.string.wizards_list) } returns wizard
+        assertEquals(wizard, viewModel.getHeadingText(1, context))
     }
 
     fun testGetHeadingText2() {
         val context = mockk<Context>()
-        coEvery{context.getString(R.string.houses_list)} returns "House"
-        assertEquals("House", viewModel.getHeadingText(2, context))
+        coEvery { context.getString(R.string.houses_list) } returns house
+        assertEquals(house, viewModel.getHeadingText(2, context))
     }
 
     fun testGetHeadingText3() {
         val context = mockk<Context>()
-        coEvery{context.getString(R.string.elixirs_list)} returns "Elixir"
-        assertEquals("Elixir", viewModel.getHeadingText(3, context))
+        coEvery { context.getString(R.string.elixirs_list) } returns elixir
+        assertEquals(elixir, viewModel.getHeadingText(3, context))
     }
 
     fun testGetHeadingText4() {
         val context = mockk<Context>()
-        coEvery{context.getString(R.string.spells_list)} returns "Spell"
-        assertEquals("Spell", viewModel.getHeadingText(4, context))
+        coEvery { context.getString(R.string.spells_list) } returns spell
+        assertEquals(spell, viewModel.getHeadingText(4, context))
     }
 
     fun testGetHeadingTextNone() {
@@ -95,68 +99,54 @@ class ProductListViewModelTest : TestCase() {
 
     fun testGetProductListWizardListSuccess() {
         runTest {
-            val name= "Kavita"
-            coEvery{wizardListUseCase.invoke()} returns(flow {
-                val wizard= mockk<Wizard>()
-                coEvery{wizard.name} returns name
-                coEvery{wizard.id} returns "1"
-                val elixir = mockk<Elixir>()
-                coEvery{elixir.characteristics} returns "characteristics"
-                coEvery{elixir.difficulty} returns "Hard"
-                coEvery{elixir.id} returns "1"
-                coEvery{elixir.effect} returns "effect"
-                coEvery{elixir.sideEffects} returns "sideEffects"
-                coEvery{elixir.manufacturer} returns "manufacturer"
-                coEvery{elixir.time} returns "time"
-                coEvery{elixir.name} returns "elixir"
-                val inventor=mockk<Inventor>()
-                coEvery { inventor.id } returns "1"
-                coEvery{inventor.name} returns "Kavita"
-                coEvery{elixir.inventors} returns(listOf(inventor))
-                val ingredient=mockk<Ingredient>()
-                coEvery{ingredient.id} returns "1"
-                coEvery{ingredient.name} returns "Ingredient"
-                coEvery{elixir.ingredients} returns(listOf(ingredient))
-                coEvery{wizard.elixirs} returns(listOf(elixir))
-                emit(Result.Success(listOf(wizard)))
+            coEvery { wizardListUseCase.invoke() } returns (flow {
+                val wizardObj = mockk<Wizard>()
+                coEvery { wizardObj.name } returns wizard
+                coEvery { wizardObj.id } returns id
+                coEvery { wizardObj.elixirs } returns (listOf(elixir))
+                emit(Result.Success(listOf(wizardObj)))
             })
             val context = mockk<Context>()
-            coEvery { context.getString(R.string.name,name) } returns "Kavita"
-            coEvery { context.getString(R.string.one_specialization) } returns "1 specializatopn"
+            coEvery { context.getString(R.string.name, wizard) } returns wizard
+            coEvery { context.getString(R.string.one_specialization) } returns one_specialization
             viewModel.getProductList(1, context)
         }
-        assertEquals("Kavita", viewModel.viewState.value.data!![0].second)
+        assertEquals(wizard, viewModel.viewState.value.data?.get(0)?.second)
     }
 
-    fun testGetProductListWizardListSuccessManySpecialization () {
+    fun testGetProductListWizardListSuccessManySpecialization() {
         runTest {
-            val name = "Kavita"
-            coEvery{wizardListUseCase.invoke()} returns(flow {
-                val wizard = mockk<Wizard>()
-                coEvery{wizard.name} returns name
-                coEvery{wizard.id} returns "1"
-                coEvery{wizard.elixirs} returns(listOf(mockk(),mockk()))
-                emit(Result.Success(listOf(wizard)))
+            coEvery { wizardListUseCase.invoke() } returns (flow {
+                val wizardObj = mockk<Wizard>()
+                coEvery { wizardObj.name } returns wizard
+                coEvery { wizardObj.id } returns id
+                coEvery { wizardObj.elixirs } returns (listOf(elixir, elixir))
+                emit(Result.Success(listOf(wizardObj)))
             })
             val context = mockk<Context>()
-            coEvery { context.getString(R.string.name,name) } returns "Kavita"
-            coEvery { context.getString(R.string.number_specialization, 2) } returns "2 specializatopn"
+            coEvery { context.getString(R.string.name, wizard) } returns wizard
+            coEvery {
+                context.getString(
+                    R.string.number_specialization,
+                    2
+                )
+            } returns two_specialization
             viewModel.getProductList(1, context)
         }
-        assertEquals("Kavita", viewModel.viewState.value.data!![0].second)
+        assertEquals(wizard, viewModel.viewState.value.data?.get(0)?.second)
     }
 
     fun testGetProductListWizardListError() {
         runTest {
-            coEvery{wizardListUseCase.invoke()} returns(flow { emit(Result.Error("Error"))})
+            coEvery { wizardListUseCase.invoke() } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getProductList(1, mockk())
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetProductListWizardListLoading() {
         runTest {
-            coEvery{wizardListUseCase.invoke()} returns(flow { emit(Result.Loading()) })
+            coEvery { wizardListUseCase.invoke() } returns (flow { emit(Result.Loading()) })
             viewModel.getProductList(1, mockk())
         }
         assertTrue(viewModel.viewState.value.isLoading)
@@ -164,47 +154,39 @@ class ProductListViewModelTest : TestCase() {
 
     fun testGetProductListHouseListSuccess() {
         runTest {
-            val houseName= "House"
-            val founder = "Founder"
-            coEvery{houseListUseCase.invoke()} returns(flow {
-                val house = mockk<House>()
-                coEvery{house.animal} returns "Tiger"
-                coEvery{house.commonRoom} returns "Common"
-                coEvery{house.id} returns "1"
-                coEvery{house.element} returns "Element"
-                coEvery{house.founder} returns founder
-                coEvery{house.ghost} returns "Ghost"
-                coEvery{house.houseColours} returns "Red"
-                coEvery{house.name} returns houseName
-                val heads = mockk<Heads>()
-                coEvery { heads.id } returns "1"
-                coEvery { heads.name } returns "Kavita Kusum"
-                coEvery { house.heads } returns (listOf(heads))
-                val traits = mockk<Traits>()
-                coEvery { traits.id } returns "1"
-                coEvery { traits.name } returns "Name"
-                coEvery{house.traits} returns(listOf(traits))
-                emit(Result.Success(listOf(house)))
+            coEvery { houseListUseCase.invoke() } returns (flow {
+                val houseObj = mockk<House>()
+                coEvery { houseObj.id } returns id
+                coEvery { houseObj.name } returns house
+                coEvery { houseObj.houseColours } returns ""
+                coEvery { houseObj.founder } returns founder
+                coEvery { houseObj.animal } returns tiger
+                coEvery { houseObj.element } returns ""
+                coEvery { houseObj.ghost } returns ""
+                coEvery { houseObj.commonRoom } returns ""
+                coEvery { houseObj.heads } returns (listOf())
+                coEvery { houseObj.traits } returns (listOf())
+                emit(Result.Success(listOf(houseObj)))
             })
             val context = mockk<Context>()
-            coEvery { context.getString(R.string.name,houseName) } returns "House"
-            coEvery { context.getString(R.string.founder, founder) } returns "Founder"
-            viewModel.getProductList(2,context )
+            coEvery { context.getString(R.string.name, house) } returns house
+            coEvery { context.getString(R.string.founder, founder) } returns founder
+            viewModel.getProductList(2, context)
         }
-        assertEquals("House", viewModel.viewState.value.data!![0].second)
+        assertEquals(house, viewModel.viewState.value.data?.get(0)?.second)
     }
 
     fun testGetProductListHouseListError() {
         runTest {
-            coEvery{houseListUseCase.invoke()} returns(flow { emit(Result.Error("Error") )})
+            coEvery { houseListUseCase.invoke() } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getProductList(2, mockk())
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetProductListHouseListLoading() {
         runTest {
-            coEvery{houseListUseCase.invoke()} returns(flow { emit(Result.Loading()) })
+            coEvery { houseListUseCase.invoke() } returns (flow { emit(Result.Loading()) })
             viewModel.getProductList(1, mockk())
         }
         assertTrue(viewModel.viewState.value.isLoading)
@@ -212,41 +194,39 @@ class ProductListViewModelTest : TestCase() {
 
     fun testGetProductListElixirListSuccess() {
         runTest {
-            val name= "elixir"
-            val effect = "effect"
-            coEvery{elixirListUseCase.invoke()} returns(flow {
-                val elixir = mockk<Elixir>()
-                coEvery{elixir.characteristics} returns "characteristics"
-                coEvery{elixir.difficulty} returns "Hard"
-                coEvery{elixir.id} returns "1"
-                coEvery{elixir.effect} returns effect
-                coEvery{elixir.sideEffects} returns "sideEffects"
-                coEvery{elixir.manufacturer} returns "manufacturer"
-                coEvery{elixir.time} returns "time"
-                coEvery{elixir.name} returns name
-                coEvery{elixir.ingredients} returns(listOf())
-                coEvery{elixir.inventors} returns(listOf())
-                emit(Result.Success(listOf(elixir)))
+            coEvery { elixirListUseCase.invoke() } returns (flow {
+                val elixirObj = mockk<Elixir>()
+                coEvery { elixirObj.name } returns elixir
+                coEvery { elixirObj.id } returns id
+                coEvery { elixirObj.effect } returns effect
+                coEvery { elixirObj.sideEffects } returns ""
+                coEvery { elixirObj.characteristics } returns characteristics
+                coEvery { elixirObj.time } returns ""
+                coEvery { elixirObj.difficulty } returns ""
+                coEvery { elixirObj.ingredients } returns (listOf())
+                coEvery { elixirObj.inventors } returns (listOf())
+                coEvery { elixirObj.manufacturer } returns ""
+                emit(Result.Success(listOf(elixirObj)))
             })
             val context = mockk<Context>()
-            coEvery { context.getString(R.string.name, name) } returns "elixir"
-            coEvery { context.getString(R.string.effect, effect) } returns "effect"
+            coEvery { context.getString(R.string.name, elixir) } returns elixir
+            coEvery { context.getString(R.string.effect, effect) } returns effect
             viewModel.getProductList(3, context)
         }
-        assertEquals("elixir", viewModel.viewState.value.data!![0].second)
+        assertEquals(elixir, viewModel.viewState.value.data?.get(0)?.second)
     }
 
     fun testGetProductListElixirListError() {
         runTest {
-            coEvery{elixirListUseCase.invoke()} returns(flow { emit(Result.Error("Error") )})
+            coEvery { elixirListUseCase.invoke() } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getProductList(3, mockk())
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetProductListElixirListLoading() {
         runTest {
-            coEvery{elixirListUseCase.invoke()} returns(flow { emit(Result.Loading()) })
+            coEvery { elixirListUseCase.invoke() } returns (flow { emit(Result.Loading()) })
             viewModel.getProductList(1, mockk())
         }
         assertTrue(viewModel.viewState.value.isLoading)
@@ -254,39 +234,37 @@ class ProductListViewModelTest : TestCase() {
 
     fun testGetProductListSpellListSuccess() {
         runTest {
-            val incantation= "incantation"
-            val name = "Kavita"
-            coEvery{spellListUseCase.invoke()} returns(flow {
-                val spell = mockk<Spell>()
-                coEvery{spell.name} returns name
-                coEvery{spell.canBeVerbal} returns "yes"
-                coEvery{spell.id} returns "1"
-                coEvery{spell.creator} returns "creator"
-                coEvery{spell.effect} returns "effect"
-                coEvery{spell.incantation} returns incantation
-                coEvery{spell.light} returns "light"
-                coEvery{spell.type} returns "type"
-                emit(Result.Success(listOf(spell)))
+            coEvery { spellListUseCase.invoke() } returns (flow {
+                val spellObj = mockk<Spell>()
+                coEvery { spellObj.name } returns spell
+                coEvery { spellObj.incantation } returns incantation
+                coEvery { spellObj.id } returns id
+                coEvery { spellObj.effect } returns effect
+                coEvery { spellObj.canBeVerbal } returns ""
+                coEvery { spellObj.type } returns ""
+                coEvery { spellObj.light } returns ""
+                coEvery { spellObj.creator } returns creator
+                emit(Result.Success(listOf(spellObj)))
             })
             val context = mockk<Context>()
-            coEvery { context.getString(R.string.incantation, incantation) } returns "incantation"
-            coEvery { context.getString(R.string.name, name) } returns "Kavita"
+            coEvery { context.getString(R.string.incantation, incantation) } returns incantation
+            coEvery { context.getString(R.string.name, spell) } returns spell
             viewModel.getProductList(4, context)
         }
-        assertEquals("Kavita", viewModel.viewState.value.data!![0].second)
+        assertEquals(spell, viewModel.viewState.value.data?.get(0)?.second)
     }
 
     fun testGetProductListSpellListError() {
         runTest {
-            coEvery{spellListUseCase.invoke()} returns(flow { emit(Result.Error("Error") )})
+            coEvery { spellListUseCase.invoke() } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getProductList(4, mockk())
         }
-        assertEquals("Error", viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.error)
     }
 
     fun testGetProductListSpellListLoading() {
         runTest {
-            coEvery{spellListUseCase.invoke()} returns(flow { emit(Result.Loading()) })
+            coEvery { spellListUseCase.invoke() } returns (flow { emit(Result.Loading()) })
             viewModel.getProductList(1, mockk())
         }
         assertTrue(viewModel.viewState.value.isLoading)

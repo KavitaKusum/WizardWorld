@@ -6,8 +6,8 @@ import com.example.wizardworld.data.mapper.ElixirListAPiResponseMapper
 import com.example.wizardworld.data.mapper.HouseListAPiResponseMapper
 import com.example.wizardworld.data.mapper.SpellListAPiResponseMapper
 import com.example.wizardworld.data.mapper.WizardListAPiResponseMapper
-import com.example.wizardworld.domain.repository.ProductsRepoImpl
-import com.example.wizardworld.domain.repository.ProductsRepoInterface
+import com.example.wizardworld.data.repository.ProductsRepoImpl
+import com.example.wizardworld.data.repository.ProductsRepoInterface
 import com.example.wizardworld.domain.usecase.*
 import dagger.Module
 import dagger.Provides

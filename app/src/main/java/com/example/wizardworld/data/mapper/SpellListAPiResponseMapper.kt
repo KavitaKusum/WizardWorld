@@ -5,19 +5,32 @@ import com.example.wizardworld.domain.model.Spell
 
 class SpellListAPiResponseMapper {
     fun toSpellList(response: List<SpellDTO>?): List<Spell> {
-        val list= mutableListOf<Spell>()
-        for(item in response!!)
-            list.add(createSpell(item))
+        val list = mutableListOf<Spell>()
+        response?.let {
+            for (item in it)
+                list.add(createSpell(item))
+        }
         return list
     }
 
-    fun toSpell(response: SpellDTO): Spell {
+    fun toSpell(response: SpellDTO?): Spell {
         return createSpell(response)
     }
 
-    private fun createSpell(item: SpellDTO): Spell {
-        return Spell(name = item.name ?: "", incantation = item.incantation ?: "", id= item.id ?: "", effect = item.effect ?: "",
-            canBeVerbal = item.canBeVerbal ?: "", type =item.type ?: "", light = item.light ?: "", creator = item.creator ?: "")
+    private fun createSpell(item: SpellDTO?): Spell {
+        item?.let {
+            return Spell(
+                name = it.name ?: "",
+                incantation = it.incantation ?: "",
+                id = it.id ?: "",
+                effect = it.effect ?: "",
+                canBeVerbal = it.canBeVerbal ?: "",
+                type = it.type ?: "",
+                light = it.light ?: "",
+                creator = it.creator ?: ""
+            )
+        }
+        return Spell("", "", "", "", "", "", "", "")
     }
 
 }

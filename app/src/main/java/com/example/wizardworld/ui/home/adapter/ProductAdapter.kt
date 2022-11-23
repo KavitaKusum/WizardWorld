@@ -5,31 +5,31 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wizardworld.domain.model.Product
 import com.example.wizardworld.databinding.ProductsListItemBinding
+import com.example.wizardworld.domain.model.Product
 
-class ProductAdapter:
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ProductAdapter :
+    RecyclerView.Adapter<ProductItemViewHolder>() {
     lateinit var onClickListener: OnClickListener
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-         return ProductItemViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductItemViewHolder {
+        return ProductItemViewHolder(
             ProductsListItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            ),onClickListener
+            ), onClickListener
         )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as ProductItemViewHolder).bind(differ.currentList[position])
+    override fun onBindViewHolder(holder: ProductItemViewHolder, position: Int) {
+        holder.bind(differ.currentList[position])
     }
 
     override fun getItemCount(): Int = differ.currentList.size
-    private val differCallback = object : DiffUtil.ItemCallback<Product>(){
+    private val differCallback = object : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return  true
+            return true
         }
 
         override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
@@ -38,7 +38,7 @@ class ProductAdapter:
 
     }
 
-    val differ = AsyncListDiffer(this,differCallback)
+    val differ = AsyncListDiffer(this, differCallback)
 
     interface OnClickListener {
         fun onClick(productId: Int)
