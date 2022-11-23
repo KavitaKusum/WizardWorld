@@ -5,10 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wizardworld.R
 import com.example.wizardworld.domain.Result
-import com.example.wizardworld.domain.model.Elixir
-import com.example.wizardworld.domain.model.House
-import com.example.wizardworld.domain.model.Spell
-import com.example.wizardworld.domain.model.Wizard
 import com.example.wizardworld.domain.usecase.ElixirListUseCase
 import com.example.wizardworld.domain.usecase.HouseListUseCase
 import com.example.wizardworld.domain.usecase.SpellListUseCase
@@ -27,127 +23,85 @@ class ProductListViewModel @Inject constructor(private val wizardListUseCase: Wi
     private val _viewState = MutableStateFlow(ViewState<List<Triple<String, String, String>>>(isLoading = true))
     val viewState = _viewState.asStateFlow()
 
-    fun getProductList(choice:Int, context: Context){
-        when(choice){
-            1-> fetchWizardList(context)
-            2-> fetchHouseList(context)
-            3-> fetchElixirList(context)
-            4-> fetchSpellList(context)
-        }
-    }
-
-    private fun fetchSpellList(context: Context) {
+    fun getProductList(choice:Int,context: Context){
         viewModelScope.launch {
-            spellListUseCase.invoke().collect {
-                when (it) {
-                    is Result.Error -> _viewState.value= ViewState(error = it.msg)
-                    is Result.Success ->
-                        it.result?.let{list->
-                            _viewState.value= ViewState(data= transformSpellList(list, context))
-                            }
-                    is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
-                }
+            when(choice){
+                1-> fetchWizardList(context)
+                2-> fetchHouseList(context)
+                3-> fetchElixirList(context)
+                4-> fetchSpellList(context)
             }
         }
     }
 
-    private fun fetchElixirList(context: Context) {
-        viewModelScope.launch {
-            elixirListUseCase.invoke().collect {
-                when (it) {
-                    is Result.Error -> _viewState.value= ViewState(error = it.msg)
-                    is Result.Success ->
-                        it.result?.let{list->
-                            _viewState.value= ViewState(data= transformElixirList(list, context))
-                             }
-                    is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
-                }
+    private suspend fun fetchSpellList(context: Context) {
+        spellListUseCase.invoke().collect {
+            when (it) {
+                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Success ->
+                    it.result?.let{list->
+                        _viewState.value= ViewState(data= getContent(4,context,list))
+                    }
+                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
             }
         }
     }
 
-    private fun fetchHouseList(context: Context) {
-        viewModelScope.launch {
-            houseListUseCase.invoke().collect {
-                when (it) {
-                    is Result.Error -> _viewState.value= ViewState(error = it.msg)
-                    is Result.Success ->
-                        it.result?.let{list->
-                            _viewState.value= ViewState(data= transformHouseList(list, context))
-                            }
-                    is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
-                }
+    private suspend fun fetchElixirList(context: Context) {
+        elixirListUseCase.invoke().collect {
+            when (it) {
+                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Success ->
+                    it.result?.let{list->
+                        _viewState.value= ViewState(data=getContent(3,context,list))
+                    }
+                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
             }
         }
     }
 
-    private fun fetchWizardList(context: Context) {
-        viewModelScope.launch {
-            wizardListUseCase.invoke().collect {
-                when (it) {
-                    is Result.Error -> _viewState.value= ViewState(error = it.msg)
-                    is Result.Success ->
-                        it.result?.let{list->
-                            _viewState.value= ViewState(data= transformWizardList(list, context))
-                            }
-                    is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
-                }
+    private suspend fun fetchHouseList(context: Context) {
+        houseListUseCase.invoke().collect {
+            when (it) {
+                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Success ->
+                    it.result?.let{list->
+                        _viewState.value= ViewState(data= getContent(2, context,list))
+                    }
+                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
             }
         }
     }
 
-    private fun transformWizardList(wizardList: List<Wizard>, context: Context): List<Triple<String,String,String>> {
-        val list = mutableListOf<Triple<String,String,String>>()
-        var triple:Triple<String,String,String>
-        for(item in wizardList) {
-            triple = Triple(item.id,
-                context.getString(R.string.name, item.name),
-                getElixirText(context,if(item.elixirs.isNullOrEmpty())0 else item.elixirs.size)
-            )
-            list.add(triple)
+    private suspend fun fetchWizardList(context: Context) {
+        wizardListUseCase.invoke().collect {
+            when (it) {
+                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Success ->
+                    it.result?.let{list->
+                        _viewState.value= ViewState(data= getContent(1,context, list))
+                    }
+                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
+            }
         }
-        return list
     }
 
-    private fun transformHouseList(houseList: List<House>, context: Context): List<Triple<String,String,String>>{
-        val list = mutableListOf<Triple<String,String,String>>()
-        var triple:Triple<String,String,String>
-        for(item in houseList) {
-            triple = Triple(item.id, context.getString(R.string.name, item.name), context.getString(R.string.founder, item.founder))
-            list.add(triple)
+    private fun getContent(choice:Int, context: Context,list: List<Triple<String, String, String>>): List<Triple<String, String, String>> {
+        val tripleList= mutableListOf<Triple<String,String,String>>()
+        for(item in list){
+            val str= when(choice){
+                1-> when(item.third.toInt()){
+                    0 -> context.getString(R.string.no_specialization)
+                    1 -> context.getString(R.string.one_specialization)
+                    else -> context.getString(R.string.number_specialization,item.third)
+                }
+                2->context.getString(R.string.founder,item.third)
+                3->context.getString(R.string.effect,item.third)
+                else->context.getString(R.string.incantation,item.third)
+            }
+            tripleList.add(Triple(item.first,item.second,str))
         }
-        return list
-    }
-
-    private fun transformElixirList(elixirList: List<Elixir>, context: Context): List<Triple<String,String,String>>{
-        val list = mutableListOf<Triple<String,String,String>>()
-        var triple:Triple<String,String,String>
-        for(item in elixirList) {
-            triple = Triple(item.id,
-                context.getString(R.string.name, item.name),
-                context.getString(R.string.effect, item.effect))
-            list.add(triple)
-        }
-        return list
-    }
-
-    private fun transformSpellList(spellList: List<Spell>, context: Context): List<Triple<String,String,String>> {
-        val list = mutableListOf<Triple<String,String,String>>()
-        var triple:Triple<String,String,String>
-        for(item in  spellList) {
-            triple = Triple(item.id, context.getString(R.string.name, item.name),
-                context.getString(R.string.incantation, item.incantation))
-            list.add(triple)
-        }
-        return list
-    }
-
-    private fun getElixirText(context: Context, size:Int): String {
-        return when (size) {
-            0 -> context.getString(R.string.no_specialization)
-            1 -> context.getString(R.string.one_specialization)
-            else -> context.getString(R.string.number_specialization,size)
-        }
+        return tripleList
     }
 
     fun getHeadingText(choice: Int, context: Context): String {
@@ -155,8 +109,7 @@ class ProductListViewModel @Inject constructor(private val wizardListUseCase: Wi
             1-> context.getString(R.string.wizards_list)
             2-> context.getString(R.string.houses_list)
             3-> context.getString(R.string.elixirs_list)
-            4-> context.getString(R.string.spells_list)
-            else-> ""
+            else-> context.getString(R.string.spells_list)
         }
     }
 }

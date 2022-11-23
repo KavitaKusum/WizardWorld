@@ -4,10 +4,6 @@ import android.content.Context
 import com.example.wizardworld.R
 import com.example.wizardworld.data.*
 import com.example.wizardworld.domain.Result
-import com.example.wizardworld.domain.model.Elixir
-import com.example.wizardworld.domain.model.House
-import com.example.wizardworld.domain.model.Spell
-import com.example.wizardworld.domain.model.Wizard
 import com.example.wizardworld.domain.usecase.ElixirListUseCase
 import com.example.wizardworld.domain.usecase.HouseListUseCase
 import com.example.wizardworld.domain.usecase.SpellListUseCase
@@ -20,7 +16,6 @@ import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -86,25 +81,10 @@ class ProductListViewModelTest : TestCase() {
         assertEquals(spell, viewModel.getHeadingText(4, context))
     }
 
-    fun testGetHeadingTextNone() {
-        assertEquals("", viewModel.getHeadingText(5, mockk()))
-    }
-
-    fun testGetProductListInvalidChoice() {
-        runBlocking {
-            viewModel.getProductList(5, mockk())
-            assertNotNull(viewModel.viewState.value)
-        }
-    }
-
     fun testGetProductListWizardListSuccess() {
         runTest {
             coEvery { wizardListUseCase.invoke() } returns (flow {
-                val wizardObj = mockk<Wizard>()
-                coEvery { wizardObj.name } returns wizard
-                coEvery { wizardObj.id } returns id
-                coEvery { wizardObj.elixirs } returns (listOf(elixir))
-                emit(Result.Success(listOf(wizardObj)))
+                emit(Result.Success(listOf(Triple(id, wizard, id))))
             })
             val context = mockk<Context>()
             coEvery { context.getString(R.string.name, wizard) } returns wizard
@@ -117,18 +97,14 @@ class ProductListViewModelTest : TestCase() {
     fun testGetProductListWizardListSuccessManySpecialization() {
         runTest {
             coEvery { wizardListUseCase.invoke() } returns (flow {
-                val wizardObj = mockk<Wizard>()
-                coEvery { wizardObj.name } returns wizard
-                coEvery { wizardObj.id } returns id
-                coEvery { wizardObj.elixirs } returns (listOf(elixir, elixir))
-                emit(Result.Success(listOf(wizardObj)))
+                emit(Result.Success(listOf(Triple(id, wizard, two))))
             })
             val context = mockk<Context>()
             coEvery { context.getString(R.string.name, wizard) } returns wizard
             coEvery {
                 context.getString(
                     R.string.number_specialization,
-                    2
+                    two
                 )
             } returns two_specialization
             viewModel.getProductList(1, context)
@@ -155,18 +131,7 @@ class ProductListViewModelTest : TestCase() {
     fun testGetProductListHouseListSuccess() {
         runTest {
             coEvery { houseListUseCase.invoke() } returns (flow {
-                val houseObj = mockk<House>()
-                coEvery { houseObj.id } returns id
-                coEvery { houseObj.name } returns house
-                coEvery { houseObj.houseColours } returns ""
-                coEvery { houseObj.founder } returns founder
-                coEvery { houseObj.animal } returns tiger
-                coEvery { houseObj.element } returns ""
-                coEvery { houseObj.ghost } returns ""
-                coEvery { houseObj.commonRoom } returns ""
-                coEvery { houseObj.heads } returns (listOf())
-                coEvery { houseObj.traits } returns (listOf())
-                emit(Result.Success(listOf(houseObj)))
+                emit(Result.Success(listOf(Triple(id, house, founder))))
             })
             val context = mockk<Context>()
             coEvery { context.getString(R.string.name, house) } returns house
@@ -195,18 +160,7 @@ class ProductListViewModelTest : TestCase() {
     fun testGetProductListElixirListSuccess() {
         runTest {
             coEvery { elixirListUseCase.invoke() } returns (flow {
-                val elixirObj = mockk<Elixir>()
-                coEvery { elixirObj.name } returns elixir
-                coEvery { elixirObj.id } returns id
-                coEvery { elixirObj.effect } returns effect
-                coEvery { elixirObj.sideEffects } returns ""
-                coEvery { elixirObj.characteristics } returns characteristics
-                coEvery { elixirObj.time } returns ""
-                coEvery { elixirObj.difficulty } returns ""
-                coEvery { elixirObj.ingredients } returns (listOf())
-                coEvery { elixirObj.inventors } returns (listOf())
-                coEvery { elixirObj.manufacturer } returns ""
-                emit(Result.Success(listOf(elixirObj)))
+                emit(Result.Success(listOf(Triple(id, elixir, effect))))
             })
             val context = mockk<Context>()
             coEvery { context.getString(R.string.name, elixir) } returns elixir
@@ -235,16 +189,7 @@ class ProductListViewModelTest : TestCase() {
     fun testGetProductListSpellListSuccess() {
         runTest {
             coEvery { spellListUseCase.invoke() } returns (flow {
-                val spellObj = mockk<Spell>()
-                coEvery { spellObj.name } returns spell
-                coEvery { spellObj.incantation } returns incantation
-                coEvery { spellObj.id } returns id
-                coEvery { spellObj.effect } returns effect
-                coEvery { spellObj.canBeVerbal } returns ""
-                coEvery { spellObj.type } returns ""
-                coEvery { spellObj.light } returns ""
-                coEvery { spellObj.creator } returns creator
-                emit(Result.Success(listOf(spellObj)))
+                emit(Result.Success(listOf(Triple(id, spell, incantation))))
             })
             val context = mockk<Context>()
             coEvery { context.getString(R.string.incantation, incantation) } returns incantation

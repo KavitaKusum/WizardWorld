@@ -17,8 +17,8 @@ class ElixirListAPiResponseMapperTest : TestCase() {
 
     fun testToElixirList() {
         assertEquals(
-            elixirListAPiResponseMapper.toElixirList(listOf(getElixirDTO()))[0].characteristics,
-            characteristics
+            elixirListAPiResponseMapper.toElixirList(listOf(getElixirDTO()))[0].first,
+            id
         )
     }
 

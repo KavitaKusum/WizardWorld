@@ -24,23 +24,20 @@ class ProductsRepoImpl @Inject constructor(
     private val houseMapper: HouseListAPiResponseMapper
 ) : ProductsRepoInterface {
 
-    private var localWizardList: List<Wizard> = listOf()
-    private var localHouseList: List<House> = listOf()
-    private var localSpellList: List<Spell> = listOf()
-    private var localElixirList: List<Elixir> = listOf()
+    private var localList: List<Triple<String, String, String>> = listOf()
 
-    override fun getWizardList(): Flow<Result<List<Wizard>>> =
+    override fun getWizardList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localWizardList.isEmpty()) {
+            if (localList.isEmpty()) {
                 val response = wizardService.getWizards()
                 if (response.isSuccessful) {
                     val list = wizardMapper.toWizardList(response.body())
-                    localWizardList = list
+                    localList = list
                     emit(Result.Success(list))
                 } else
                     emit(Result.Error(response.message()))
             } else
-                emit(Result.Success(localWizardList))
+                emit(Result.Success(localList))
         }.flowOn(Dispatchers.IO)
 
     override fun getWizardById(productId: String): Flow<Result<Wizard>> =
@@ -52,18 +49,18 @@ class ProductsRepoImpl @Inject constructor(
                 emit(Result.Error(response.message()))
         }.flowOn(Dispatchers.IO)
 
-    override fun getSpellList(): Flow<Result<List<Spell>>> =
+    override fun getSpellList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localSpellList.isEmpty()) {
+            if (localList.isEmpty()) {
                 val response = wizardService.getSpells()
                 if (response.isSuccessful) {
                     val list = spellMapper.toSpellList(response.body())
-                    localSpellList = list
+                    localList = list
                     emit(Result.Success(list))
                 } else
                     emit(Result.Error(response.message()))
             } else
-                emit(Result.Success(localSpellList))
+                emit(Result.Success(localList))
         }.flowOn(Dispatchers.IO)
 
     override fun getSpellById(productId: String): Flow<Result<Spell>> =
@@ -75,18 +72,18 @@ class ProductsRepoImpl @Inject constructor(
                 emit(Result.Error(response.message()))
         }.flowOn(Dispatchers.IO)
 
-    override fun getElixirList(): Flow<Result<List<Elixir>>> =
+    override fun getElixirList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localElixirList.isEmpty()) {
+            if (localList.isEmpty()) {
                 val response = wizardService.getElixirs()
                 if (response.isSuccessful) {
                     val list = elixirMapper.toElixirList((response.body()))
-                    localElixirList = list
+                    localList = list
                     emit(Result.Success(list))
                 } else
                     emit(Result.Error(response.message()))
             } else
-                emit(Result.Success(localElixirList))
+                emit(Result.Success(localList))
         }.flowOn(Dispatchers.IO)
 
     override fun getElixirById(productId: String): Flow<Result<Elixir>> =
@@ -98,17 +95,17 @@ class ProductsRepoImpl @Inject constructor(
                 emit(Result.Error(response.message()))
         }.flowOn(Dispatchers.IO)
 
-    override fun getHouseList(): Flow<Result<List<House>>> =
+    override fun getHouseList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localHouseList.isEmpty()) {
+            if (localList.isEmpty()) {
                 val response = wizardService.getHouses()
                 if (response.isSuccessful) {
                     val list = houseMapper.toHouseList(response.body())
-                    localHouseList = list
+                    localList = list
                     emit(Result.Success(list))
                 } else
                     emit(Result.Error(response.message()))
-            } else emit(Result.Success(localHouseList))
+            } else emit(Result.Success(localList))
         }.flowOn(Dispatchers.IO)
 
     override fun getHouseById(productId: String): Flow<Result<House>> =

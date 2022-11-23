@@ -4,11 +4,12 @@ import com.example.wizardworld.data.dto.HouseDTO
 import com.example.wizardworld.domain.model.House
 
 class HouseListAPiResponseMapper {
-    fun toHouseList(response: List<HouseDTO>?): List<House> {
-        val list = mutableListOf<House>()
+    fun toHouseList(response: List<HouseDTO>?): List<Triple<String, String, String>> {
+        val list = mutableListOf<Triple<String, String, String>>()
         response?.let {
-            for (item in it)
-                list.add(createHouse(item))
+            for (item in it) {
+                list.add(Triple(item.id, item.name, item.founder))
+            }
         }
         return list
     }

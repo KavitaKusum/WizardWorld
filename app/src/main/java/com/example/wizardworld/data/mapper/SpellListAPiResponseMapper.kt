@@ -4,11 +4,12 @@ import com.example.wizardworld.data.dto.SpellDTO
 import com.example.wizardworld.domain.model.Spell
 
 class SpellListAPiResponseMapper {
-    fun toSpellList(response: List<SpellDTO>?): List<Spell> {
-        val list = mutableListOf<Spell>()
+    fun toSpellList(response: List<SpellDTO>?): List<Triple<String, String, String>> {
+        val list = mutableListOf<Triple<String, String, String>>()
         response?.let {
-            for (item in it)
-                list.add(createSpell(item))
+            for (item in it) {
+                list.add(Triple(item.id, item.name, item.incantation))
+            }
         }
         return list
     }

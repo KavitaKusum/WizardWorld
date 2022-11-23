@@ -15,7 +15,7 @@ class SpellListAPiResponseMapperTest : TestCase() {
     }
 
     fun testToSpellList() {
-        assertEquals(mapper.toSpellList(listOf(getSpellDTO()))[0].name, spell)
+        assertEquals(mapper.toSpellList(listOf(getSpellDTO()))[0].first, id)
     }
 
     fun testToSpell() {

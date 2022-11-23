@@ -18,7 +18,7 @@ class WizardListAPiResponseMapperTest : TestCase() {
 
     fun testToWizardList() {
         assertEquals(
-            mapper.toWizardList(listOf(getWizardDTO()))[0].name,
+            mapper.toWizardList(listOf(getWizardDTO()))[0].second,
             String.format("%s %s", wizard, elixir)
         )
     }

@@ -1,33 +1,9 @@
 <resources>
     <string name="app_name">WizardWorld</string>
-    <string name="bottom_nav_home_label">Home</string>
     <string name="bottom_nav_wizard_label">Wizards</string>
     <string name="bottom_nav_house_label">Houses</string>
     <string name="bottom_nav_elixir_label">Elixirs</string>
     <string name="bottom_nav_spell_label">Spells</string>
-    <string name="login_fragment_label">Login</string>
-    <string name="login_welcome">Welcome</string>
-    <string name="login_welcome_text">to the wizard world!</string>
-    <string name="login_username_hint">Username</string>
-    <string name="login_username_ph">Enter username</string>
-    <string name="login_password_hint">Password</string>
-    <string name="login_password_ph">Enter password</string>
-    <string name="login_error_text">Incorrect Password</string>
-    <string name="login_signup_text">New User? Sign Up</string>
-    <string name="login_btn_text">Log in</string>
-    <string name="signup_fragment_label">Sign up</string>
-    <string name="bg_img_desc">login</string>
-    <string name="signup_welcome_hello">Hello,</string>
-    <string name="signup_welcome_text">Sign Up!</string>
-    <string name="signup_name_hint">User name</string>
-    <string name="signup_name_ph">Your Name</string>
-    <string name="signup_password_hint">Password</string>
-    <string name="signup_password_ph">Enter Password</string>
-    <string name="signup_conf_password_hint">Confirm password</string>
-    <string name="signup_cnf_password_ph">Enter Password Again</string>
-    <string name="signup_switch_tnc_label">I accept the policy and terms</string>
-    <string name="signup_login_text">Already have an account? Log In</string>
-    <string name="signup_btn_text">Sign Up</string>
     <string name="add_img_item_desc">image view</string>
     <string name="name">Name: %s</string>
     <string name="specialization">Specialization:</string>
@@ -35,8 +11,6 @@
     <string name="house_details">House details:</string>
     <string name="spell_details">Spell details:</string>
     <string name="elixir_details">Elixir details:</string>
-    <string name="house_name">House name:</string>
-    <string name="color">Color: %s</string>
     <string name="founder">Founder: %s</string>
     <string name="animal">Animal: %s</string>
     <string name="element">Element: %s</string>
@@ -62,12 +36,8 @@
     <string name="spells_list">Spells list</string>
     <string name="houses_list">Houses list</string>
     <string name="error_text">Api error: %s</string>
-    <string name="no_incantation">No incantation available</string>
-    <string name="none">None</string>
-    <string name="no_traits">No Traits available</string>
-    <string name="no_founder">No founder available</string>
-    <string name="no_elixir">No elixir available</string>
     <string name="no_specialization">No specialization</string>
     <string name="one_specialization">Specialized in 1 elixir</string>
-    <string name="number_specialization">Specialized in %d elixirs</string>
+    <string name="number_specialization">Specialized in %s elixirs</string>
+    <string name="color">Color: %sr</string>
 </resources>

@@ -4,11 +4,12 @@ import com.example.wizardworld.data.dto.ElixirDTO
 import com.example.wizardworld.domain.model.Elixir
 
 class ElixirListAPiResponseMapper {
-    fun toElixirList(response: List<ElixirDTO>?): List<Elixir> {
-        val list = mutableListOf<Elixir>()
+    fun toElixirList(response: List<ElixirDTO>?): List<Triple<String, String, String>> {
+        val list = mutableListOf<Triple<String, String, String>>()
         response?.let {
-            for (item in it)
-                list.add(createElixir(item))
+            for (item in it) {
+                list.add(Triple(item.id, item.name, item.effect))
+            }
         }
         return list
     }

@@ -16,7 +16,7 @@ class HouseListAPiResponseMapperTest : TestCase() {
     }
 
     fun testToHouseList() {
-        assertEquals(mapper.toHouseList(listOf(getHouseDTO()))[0].animal, tiger)
+        assertEquals(mapper.toHouseList(listOf(getHouseDTO()))[0].first, id)
     }
 
     fun testToHouse() {
