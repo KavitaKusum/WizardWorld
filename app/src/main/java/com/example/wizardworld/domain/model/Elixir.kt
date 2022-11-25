@@ -11,4 +11,6 @@ data class Elixir(
     val manufacturer: String,
     val inventors: List<String>,
     val ingredients: List<String>
-)
+) {
+    constructor() : this("","","","","","","","", emptyList(), emptyList())
+}

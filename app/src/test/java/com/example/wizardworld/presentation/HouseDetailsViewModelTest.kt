@@ -51,7 +51,7 @@ class HouseDetailsViewModelTest : TestCase() {
             })
             viewModel.getHouseDetails(id)
         }
-        assertEquals(house, viewModel.viewState.value.data?.name)
+        assertEquals(house, viewModel.viewState.value.result.name)
     }
 
     fun testGetHouseDetailsError() {
@@ -59,7 +59,7 @@ class HouseDetailsViewModelTest : TestCase() {
             coEvery { houseDetailUseCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getHouseDetails(id)
         }
-        assertEquals(errorString, viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.msg)
     }
 
     fun testGetHouseDetailsLoading() {

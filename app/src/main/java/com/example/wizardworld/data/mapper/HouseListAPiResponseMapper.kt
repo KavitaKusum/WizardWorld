@@ -8,18 +8,15 @@ class HouseListAPiResponseMapper {
         val list = mutableListOf<Triple<String, String, String>>()
         response?.let {
             for (item in it) {
-                list.add(Triple(item.id, item.name, item.founder))
+                list.add(Triple(item.id?:"", item.name?:"", item.founder?:""))
             }
         }
         return list
     }
 
     fun toHouse(response: HouseDTO?): House {
-        return createHouse(response)
-    }
-
-    private fun createHouse(item: HouseDTO?): House {
-        item?.let {
+        var house= House()
+        response?.let {
             val heads = mutableListOf<String>()
             val traits = mutableListOf<String>()
             it.heads?.let { list ->
@@ -30,7 +27,7 @@ class HouseListAPiResponseMapper {
                 for (trait in list)
                     traits.add(trait.name ?: "")
             }
-            return House(
+            house=  House(
                 id = it.id ?: "",
                 name = it.name ?: "",
                 houseColours = it.houseColours ?: "",
@@ -43,7 +40,7 @@ class HouseListAPiResponseMapper {
                 traits = traits
             )
         }
-        return House("", "", "", "", "", "", "", "", listOf(), listOf())
+        return house
     }
 
     private fun getHeadFullName(firstName: String?, lastName: String?): String {

@@ -10,7 +10,7 @@ class WizardListAPiResponseMapper {
             for (item in it) {
                 list.add(
                     Triple(
-                        item.id,
+                        item.id?:"",
                         getWizardFullName(item.firstName, item.lastName),
                         if (item.elixirs.isNullOrEmpty()) "0" else item.elixirs.size.toString()
                     )
@@ -21,23 +21,20 @@ class WizardListAPiResponseMapper {
     }
 
     fun toWizard(response: WizardDTO?): Wizard {
-        return createWizard(response)
-    }
-
-    private fun createWizard(item: WizardDTO?): Wizard {
-        item?.let {
+        var wizard= Wizard()
+        response?.let {
             val elixirList = mutableListOf<String>()
             it.elixirs?.let { list ->
                 for (elixirItem in list)
                     elixirList.add(elixirItem.name)
             }
-            return Wizard(
-                getWizardFullName(item.firstName, item.lastName),
-                item.id ?: "",
+            wizard= Wizard(
+                getWizardFullName(it.firstName, it.lastName),
+                it.id ?: "",
                 elixirList
             )
         }
-        return Wizard("", "", listOf())
+        return wizard
     }
 
     private fun getWizardFullName(firstName: String?, lastName: String?): String {

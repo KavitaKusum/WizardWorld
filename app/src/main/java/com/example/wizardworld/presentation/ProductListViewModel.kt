@@ -3,6 +3,7 @@ package com.example.wizardworld.presentation
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wizardworld.CHOICE
 import com.example.wizardworld.R
 import com.example.wizardworld.domain.Result
 import com.example.wizardworld.domain.usecase.ElixirListUseCase
@@ -16,20 +17,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductListViewModel @Inject constructor(private val wizardListUseCase: WizardListUseCase,
-                                               private val spellListUseCase: SpellListUseCase,
-                                               private val elixirListUseCase: ElixirListUseCase,
-                                               private val houseListUseCase: HouseListUseCase) : ViewModel() {
-    private val _viewState = MutableStateFlow(ViewState<List<Triple<String, String, String>>>(isLoading = true))
+class ProductListViewModel @Inject constructor(
+    private val wizardListUseCase: WizardListUseCase,
+    private val spellListUseCase: SpellListUseCase,
+    private val elixirListUseCase: ElixirListUseCase,
+    private val houseListUseCase: HouseListUseCase
+) : ViewModel() {
+    private val _viewState = MutableStateFlow<ViewState<List<Triple<String, String, String>>>>(
+        ViewState.Loading(emptyList())
+    )
     val viewState = _viewState.asStateFlow()
 
-    fun getProductList(choice:Int,context: Context){
+    fun getProductList(choice: Int, context: Context) {
         viewModelScope.launch {
-            when(choice){
-                1-> fetchWizardList(context)
-                2-> fetchHouseList(context)
-                3-> fetchElixirList(context)
-                4-> fetchSpellList(context)
+            when (choice) {
+                CHOICE.ONE.value -> fetchWizardList(context)
+                CHOICE.TWO.value -> fetchHouseList(context)
+                CHOICE.THREE.value -> fetchElixirList(context)
+                CHOICE.FOUR.value -> fetchSpellList(context)
             }
         }
     }
@@ -37,12 +42,14 @@ class ProductListViewModel @Inject constructor(private val wizardListUseCase: Wi
     private suspend fun fetchSpellList(context: Context) {
         spellListUseCase.invoke().collect {
             when (it) {
-                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Error -> _viewState.value =
+                    ViewState.Error(emptyList(), it.msg ?: context.getString(R.string.error))
                 is Result.Success ->
-                    it.result?.let{list->
-                        _viewState.value= ViewState(data= getContent(4,context,list))
+                    it.result?.let { list ->
+                        _viewState.value =
+                            ViewState.Success(getContent(CHOICE.FOUR.value, context, list))
                     }
-                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
+                is Result.Loading -> _viewState.value = ViewState.Loading(emptyList())
             }
         }
     }
@@ -50,12 +57,14 @@ class ProductListViewModel @Inject constructor(private val wizardListUseCase: Wi
     private suspend fun fetchElixirList(context: Context) {
         elixirListUseCase.invoke().collect {
             when (it) {
-                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Error -> _viewState.value =
+                    ViewState.Error(emptyList(), it.msg ?: context.getString(R.string.error))
                 is Result.Success ->
-                    it.result?.let{list->
-                        _viewState.value= ViewState(data=getContent(3,context,list))
+                    it.result?.let { list ->
+                        _viewState.value =
+                            ViewState.Success(getContent(CHOICE.THREE.value, context, list))
                     }
-                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
+                is Result.Loading -> _viewState.value = ViewState.Loading(emptyList())
             }
         }
     }
@@ -63,12 +72,14 @@ class ProductListViewModel @Inject constructor(private val wizardListUseCase: Wi
     private suspend fun fetchHouseList(context: Context) {
         houseListUseCase.invoke().collect {
             when (it) {
-                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Error -> _viewState.value =
+                    ViewState.Error(emptyList(), it.msg ?: context.getString(R.string.error))
                 is Result.Success ->
-                    it.result?.let{list->
-                        _viewState.value= ViewState(data= getContent(2, context,list))
+                    it.result?.let { list ->
+                        _viewState.value =
+                            ViewState.Success(getContent(CHOICE.TWO.value, context, list))
                     }
-                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
+                is Result.Loading -> _viewState.value = ViewState.Loading(emptyList())
             }
         }
     }
@@ -76,40 +87,46 @@ class ProductListViewModel @Inject constructor(private val wizardListUseCase: Wi
     private suspend fun fetchWizardList(context: Context) {
         wizardListUseCase.invoke().collect {
             when (it) {
-                is Result.Error -> _viewState.value= ViewState(error = it.msg)
+                is Result.Error -> _viewState.value =
+                    ViewState.Error(emptyList(), it.msg ?: context.getString(R.string.error))
                 is Result.Success ->
-                    it.result?.let{list->
-                        _viewState.value= ViewState(data= getContent(1,context, list))
+                    it.result?.let { list ->
+                        _viewState.value =
+                            ViewState.Success(getContent(CHOICE.ONE.value, context, list))
                     }
-                is Result.Loading -> _viewState.value= ViewState(isLoading = true, data = null, error = null)
+                is Result.Loading -> _viewState.value = ViewState.Loading(emptyList())
             }
         }
     }
 
-    private fun getContent(choice:Int, context: Context,list: List<Triple<String, String, String>>): List<Triple<String, String, String>> {
-        val tripleList= mutableListOf<Triple<String,String,String>>()
-        for(item in list){
-            val str= when(choice){
-                1-> when(item.third.toInt()){
+    private fun getContent(
+        choice: Int,
+        context: Context,
+        list: List<Triple<String, String, String>>
+    ): List<Triple<String, String, String>> {
+        val tripleList = mutableListOf<Triple<String, String, String>>()
+        for (item in list) {
+            val str = when (choice) {
+                CHOICE.ONE.value -> when (item.third.toInt()) {
                     0 -> context.getString(R.string.no_specialization)
                     1 -> context.getString(R.string.one_specialization)
-                    else -> context.getString(R.string.number_specialization,item.third)
+                    else -> context.getString(R.string.number_specialization, item.third)
                 }
-                2->context.getString(R.string.founder,item.third)
-                3->context.getString(R.string.effect,item.third)
-                else->context.getString(R.string.incantation,item.third)
+                CHOICE.TWO.value -> context.getString(R.string.founder, item.third)
+                CHOICE.THREE.value -> context.getString(R.string.effect, item.third)
+                else -> context.getString(R.string.incantation, item.third)
             }
-            tripleList.add(Triple(item.first,item.second,str))
+            tripleList.add(Triple(item.first, item.second, str))
         }
         return tripleList
     }
 
     fun getHeadingText(choice: Int, context: Context): String {
-        return when(choice){
-            1-> context.getString(R.string.wizards_list)
-            2-> context.getString(R.string.houses_list)
-            3-> context.getString(R.string.elixirs_list)
-            else-> context.getString(R.string.spells_list)
+        return when (choice) {
+            CHOICE.ONE.value -> context.getString(R.string.wizards_list)
+            CHOICE.TWO.value -> context.getString(R.string.houses_list)
+            CHOICE.THREE.value -> context.getString(R.string.elixirs_list)
+            else -> context.getString(R.string.spells_list)
         }
     }
 }

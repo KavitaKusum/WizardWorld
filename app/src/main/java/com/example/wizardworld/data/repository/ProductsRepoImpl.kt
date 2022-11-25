@@ -23,97 +23,80 @@ class ProductsRepoImpl @Inject constructor(
     private val elixirMapper: ElixirListAPiResponseMapper,
     private val houseMapper: HouseListAPiResponseMapper
 ) : ProductsRepoInterface {
-
-    private var localList: List<Triple<String, String, String>> = listOf()
-
     override fun getWizardList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localList.isEmpty()) {
-                val response = wizardService.getWizards()
-                if (response.isSuccessful) {
-                    val list = wizardMapper.toWizardList(response.body())
-                    localList = list
-                    emit(Result.Success(list))
-                } else
-                    emit(Result.Error(response.message()))
-            } else
-                emit(Result.Success(localList))
+            val response = wizardService.getWizards()
+            when {
+                response.isSuccessful -> emit(Result.Success(wizardMapper.toWizardList(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getWizardById(productId: String): Flow<Result<Wizard>> =
         flow {
             val response = wizardService.getWizardById(productId)
-            if (response.isSuccessful)
-                emit(Result.Success(wizardMapper.toWizard(response.body())))
-            else
-                emit(Result.Error(response.message()))
+            when {
+                response.isSuccessful -> emit(Result.Success(wizardMapper.toWizard(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getSpellList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localList.isEmpty()) {
-                val response = wizardService.getSpells()
-                if (response.isSuccessful) {
-                    val list = spellMapper.toSpellList(response.body())
-                    localList = list
-                    emit(Result.Success(list))
-                } else
-                    emit(Result.Error(response.message()))
-            } else
-                emit(Result.Success(localList))
+            val response = wizardService.getSpells()
+            when {
+                response.isSuccessful -> {
+                    when {
+                        response.isSuccessful -> emit(Result.Success(spellMapper.toSpellList(response.body())))
+                        else -> emit(Result.Error(response.message()))
+                    }
+                }
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getSpellById(productId: String): Flow<Result<Spell>> =
         flow {
             val response = wizardService.getSpellById(productId)
-            if (response.isSuccessful)
-                emit(Result.Success(spellMapper.toSpell(response.body())))
-            else
-                emit(Result.Error(response.message()))
+            when {
+                response.isSuccessful -> emit(Result.Success(spellMapper.toSpell(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getElixirList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localList.isEmpty()) {
-                val response = wizardService.getElixirs()
-                if (response.isSuccessful) {
-                    val list = elixirMapper.toElixirList((response.body()))
-                    localList = list
-                    emit(Result.Success(list))
-                } else
-                    emit(Result.Error(response.message()))
-            } else
-                emit(Result.Success(localList))
+            val response = wizardService.getElixirs()
+            when {
+                response.isSuccessful -> emit(Result.Success(elixirMapper.toElixirList(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getElixirById(productId: String): Flow<Result<Elixir>> =
         flow {
             val response = wizardService.getElixirById(productId)
-            if (response.isSuccessful)
-                emit(Result.Success(elixirMapper.toElixir(response.body())))
-            else
-                emit(Result.Error(response.message()))
+            when {
+                response.isSuccessful -> emit(Result.Success(elixirMapper.toElixir(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getHouseList(): Flow<Result<List<Triple<String, String, String>>>> =
         flow {
-            if (localList.isEmpty()) {
-                val response = wizardService.getHouses()
-                if (response.isSuccessful) {
-                    val list = houseMapper.toHouseList(response.body())
-                    localList = list
-                    emit(Result.Success(list))
-                } else
-                    emit(Result.Error(response.message()))
-            } else emit(Result.Success(localList))
+            val response = wizardService.getHouses()
+            when {
+                response.isSuccessful -> emit(Result.Success(houseMapper.toHouseList(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 
     override fun getHouseById(productId: String): Flow<Result<House>> =
         flow {
             val response = wizardService.getHouseById(productId)
-            if (response.isSuccessful)
-                emit(Result.Success(houseMapper.toHouse(response.body())))
-            else
-                emit(Result.Error(response.message()))
+            when {
+                response.isSuccessful -> emit(Result.Success(houseMapper.toHouse(response.body())))
+                else -> emit(Result.Error(response.message()))
+            }
         }.flowOn(Dispatchers.IO)
 }

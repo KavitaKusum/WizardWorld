@@ -48,7 +48,7 @@ class WizardDetailsViewModelTest : TestCase() {
             })
             viewModel.getWizardDetails(id)
         }
-        assertEquals(wizard, viewModel.viewState.value.data?.name)
+        assertEquals(wizard, viewModel.viewState.value.result.name)
     }
 
     fun testGetWizardDetailsError() {
@@ -56,7 +56,7 @@ class WizardDetailsViewModelTest : TestCase() {
             coEvery { useCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getWizardDetails(id)
         }
-        assertEquals(errorString, viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.msg)
     }
 
     fun testGetWizardDetailsLoading() {

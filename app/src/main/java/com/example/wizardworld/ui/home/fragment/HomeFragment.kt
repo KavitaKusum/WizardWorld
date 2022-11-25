@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.wizardworld.POSITION_ID
 import com.example.wizardworld.R
 import com.example.wizardworld.databinding.FragmentHomeBinding
 import com.example.wizardworld.presentation.HomeViewModel
@@ -20,7 +21,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment @Inject constructor() : Fragment() {
-
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
     private val productAdapter by lazy { ProductAdapter() }
@@ -39,10 +39,10 @@ class HomeFragment @Inject constructor() : Fragment() {
         with(binding.productsRecyclerView) {
             layoutManager = GridLayoutManager(context, 2)
             productAdapter.onClickListener = object : ProductAdapter.OnClickListener {
-                override fun onClick(productId: Int) {
+                override fun onClick(choice: Int) {
                     findNavController().navigate(
                         R.id.action_home_to_ProductsListFragment,
-                        bundleOf("position" to productId)
+                        bundleOf(POSITION_ID to choice)
                     )
                 }
             }

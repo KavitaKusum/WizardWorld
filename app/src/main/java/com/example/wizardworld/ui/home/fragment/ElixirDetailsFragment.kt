@@ -10,17 +10,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.wizardworld.PRODUCT_ID
 import com.example.wizardworld.R
 import com.example.wizardworld.databinding.FragmentElixirDetailsBinding
 import com.example.wizardworld.domain.model.Elixir
 import com.example.wizardworld.presentation.ElixirDetailsViewModel
+import com.example.wizardworld.presentation.ViewState
 import com.example.wizardworld.ui.home.adapter.DetailsAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ElixirDetailsFragment : Fragment() {
-    private val productId = "productId"
     private lateinit var binding: FragmentElixirDetailsBinding
     private val viewModel: ElixirDetailsViewModel by viewModels()
     private val ingredientsAdapter by lazy { DetailsAdapter() }
@@ -34,22 +35,24 @@ class ElixirDetailsFragment : Fragment() {
         setIngredientsView()
         setInventorsView()
         arguments.let {
-            viewModel.getElixirDetails(it?.getString(productId) ?: "")
+            viewModel.getElixirDetails(it?.getString(PRODUCT_ID) ?: "")
         }
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if (viewState.isLoading) showLoading()
-                viewState.error?.let {
-                    hideLoading()
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.error_text, viewState.error),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                viewState.data?.let {
-                    hideLoading()
-                    setViews(it)
+                when (viewState) {
+                    is ViewState.Error -> {
+                        hideLoading()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.error_text, viewState.msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is ViewState.Loading -> showLoading()
+                    is ViewState.Success -> {
+                        hideLoading()
+                        setViews(viewState.result)
+                    }
                 }
             }
         }
@@ -66,17 +69,19 @@ class ElixirDetailsFragment : Fragment() {
             elixirDifficulty.text = getString(R.string.difficulty, data.difficulty)
             elixirManufacturer.text = getString(R.string.manufacturer, data.manufacturer)
             elixirTime.text = getString(R.string.time, data.time)
-            if (data.ingredients.isEmpty())
-                ingredientsRv.isVisible = false
-            else {
-                ingredientsAdapter.differ.submitList(data.ingredients)
-                ingredientsLabel.text = getString(R.string.inventors)
+            when {
+                data.ingredients.isEmpty() -> ingredientsRv.isVisible = false
+                else -> {
+                    ingredientsAdapter.differ.submitList(data.ingredients)
+                    ingredientsLabel.text = getString(R.string.inventors)
+                }
             }
-            if (data.inventors.isEmpty())
-                inventorsRv.isVisible = false
-            else {
-                ingredientsAdapter.differ.submitList(data.inventors)
-                inventorsLabel.text = getString(R.string.ingredients)
+            when {
+                data.inventors.isEmpty() -> inventorsRv.isVisible = false
+                else -> {
+                    ingredientsAdapter.differ.submitList(data.inventors)
+                    inventorsLabel.text = getString(R.string.ingredients)
+                }
             }
         }
     }

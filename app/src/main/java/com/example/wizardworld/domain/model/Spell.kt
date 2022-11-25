@@ -9,4 +9,6 @@ data class Spell(
     val type: String,
     val light: String,
     val creator: String
-)
+) {
+    constructor() : this("", "", "", "", "", "", "", "")
+}

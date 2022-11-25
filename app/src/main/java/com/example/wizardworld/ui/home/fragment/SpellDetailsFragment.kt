@@ -9,16 +9,17 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.wizardworld.PRODUCT_ID
 import com.example.wizardworld.R
 import com.example.wizardworld.databinding.FragmentSpellDetailsBinding
 import com.example.wizardworld.domain.model.Spell
 import com.example.wizardworld.presentation.SpellDetailsViewModel
+import com.example.wizardworld.presentation.ViewState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SpellDetailsFragment : Fragment() {
-    private val productId = "productId"
     private lateinit var binding: FragmentSpellDetailsBinding
     private val viewModel: SpellDetailsViewModel by viewModels()
 
@@ -28,22 +29,24 @@ class SpellDetailsFragment : Fragment() {
     ): View {
         binding = FragmentSpellDetailsBinding.inflate(layoutInflater)
         arguments.let {
-            viewModel.getSpellDetails(it?.getString(productId) ?: "")
+            viewModel.getSpellDetails(it?.getString(PRODUCT_ID) ?: "")
         }
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if (viewState.isLoading) showLoading()
-                viewState.error?.let {
-                    hideLoading()
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.error_text, viewState.error),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                viewState.data?.let {
-                    hideLoading()
-                    setViews(it)
+                when (viewState) {
+                    is ViewState.Error -> {
+                        hideLoading()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.error_text, viewState.msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is ViewState.Loading -> showLoading()
+                    is ViewState.Success -> {
+                        hideLoading()
+                        setViews(viewState.result)
+                    }
                 }
             }
         }

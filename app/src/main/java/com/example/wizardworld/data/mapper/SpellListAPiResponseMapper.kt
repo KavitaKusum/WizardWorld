@@ -8,19 +8,16 @@ class SpellListAPiResponseMapper {
         val list = mutableListOf<Triple<String, String, String>>()
         response?.let {
             for (item in it) {
-                list.add(Triple(item.id, item.name, item.incantation))
+                list.add(Triple(item.id?:"", item.name?:"", item.incantation?:""))
             }
         }
         return list
     }
 
     fun toSpell(response: SpellDTO?): Spell {
-        return createSpell(response)
-    }
-
-    private fun createSpell(item: SpellDTO?): Spell {
-        item?.let {
-            return Spell(
+        var spell = Spell()
+        response?.let {
+            spell = Spell(
                 name = it.name ?: "",
                 incantation = it.incantation ?: "",
                 id = it.id ?: "",
@@ -31,7 +28,6 @@ class SpellListAPiResponseMapper {
                 creator = it.creator ?: ""
             )
         }
-        return Spell("", "", "", "", "", "", "", "")
+        return spell
     }
-
 }

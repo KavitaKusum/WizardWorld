@@ -12,9 +12,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.wizardworld.CHOICE
+import com.example.wizardworld.POSITION_ID
+import com.example.wizardworld.PRODUCT_ID
 import com.example.wizardworld.R
 import com.example.wizardworld.databinding.FragmentWizardsBinding
 import com.example.wizardworld.presentation.ProductListViewModel
+import com.example.wizardworld.presentation.ViewState
 import com.example.wizardworld.ui.home.HomeActivity
 import com.example.wizardworld.ui.home.adapter.ProductListAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,7 +26,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProductListFragment : Fragment() {
-    private val identifier = "productId"
     private lateinit var binding: FragmentWizardsBinding
     private val viewModel: ProductListViewModel by viewModels()
     private val productListAdapter by lazy { ProductListAdapter() }
@@ -34,7 +37,7 @@ class ProductListFragment : Fragment() {
         (requireActivity() as HomeActivity).binding.imgBack.isVisible = true
         var choice: Int
         arguments.let {
-            choice = it?.getInt("position") ?: 0
+            choice = it?.getInt(POSITION_ID) ?: 0
         }
         binding = FragmentWizardsBinding.inflate(layoutInflater)
         with(binding.wizardsRecyclerView) {
@@ -42,22 +45,23 @@ class ProductListFragment : Fragment() {
             productListAdapter.onClickListener = object :
                 ProductListAdapter.OnClickListener {
                 override fun onClick(productId: String) {
+                    val bundle = bundleOf(PRODUCT_ID to productId)
                     when (choice) {
-                        1 -> findNavController().navigate(
+                        CHOICE.ONE.value -> findNavController().navigate(
                             R.id.action_to_WizardDetailsFragment,
-                            bundleOf(identifier to productId)
+                            bundle
                         )
-                        2 -> findNavController().navigate(
+                        CHOICE.TWO.value -> findNavController().navigate(
                             R.id.action_to_HouseDetailsFragment,
-                            bundleOf(identifier to productId)
+                            bundle
                         )
-                        3 -> findNavController().navigate(
+                        CHOICE.THREE.value -> findNavController().navigate(
                             R.id.action_to_ElixirDetailsFragment,
-                            bundleOf(identifier to productId)
+                            bundle
                         )
-                        4 -> findNavController().navigate(
+                        CHOICE.FOUR.value -> findNavController().navigate(
                             R.id.action_to_SpellDetailsFragment,
-                            bundleOf(identifier to productId)
+                            bundle
                         )
                     }
                 }
@@ -67,18 +71,20 @@ class ProductListFragment : Fragment() {
         viewModel.getProductList(choice, requireContext())
         lifecycleScope.launch {
             viewModel.viewState.collect { viewState ->
-                if (viewState.isLoading) showLoading()
-                viewState.error?.let {
-                    hideLoading()
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.error_text, viewState.error),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                viewState.data?.let {
-                    hideLoading()
-                    setViews(choice, it)
+                when (viewState) {
+                    is ViewState.Error -> {
+                        hideLoading()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.error_text, viewState.msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is ViewState.Loading -> showLoading()
+                    is ViewState.Success -> {
+                        hideLoading()
+                        setViews(choice, viewState.result)
+                    }
                 }
             }
         }

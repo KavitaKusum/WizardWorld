@@ -14,17 +14,20 @@ import javax.inject.Inject
 @HiltViewModel
 class HouseDetailsViewModel @Inject constructor(private val houseUseCase: HouseDetailUseCase) :
     ViewModel() {
-    private val _viewState = MutableStateFlow(ViewState<House>(isLoading = true))
+    private val emptyObject = House()
+    private val _viewState = MutableStateFlow<ViewState<House>>(ViewState.Loading(emptyObject))
     val viewState = _viewState.asStateFlow()
 
     fun getHouseDetails(houseId: String) {
         viewModelScope.launch {
             houseUseCase.invoke(houseId).collect {
                 when (it) {
-                    is Result.Error -> _viewState.value = ViewState(error = it.msg)
-                    is Result.Success -> _viewState.value = ViewState(data = it.result)
-                    is Result.Loading -> _viewState.value =
-                        ViewState(isLoading = true, data = null, error = null)
+                    is Result.Error -> _viewState.value = ViewState.Error(emptyObject, it.msg ?: "")
+                    is Result.Success ->
+                        it.result?.let { list ->
+                            _viewState.value = ViewState.Success(list)
+                        }
+                    is Result.Loading -> _viewState.value = ViewState.Loading(emptyObject)
                 }
             }
         }

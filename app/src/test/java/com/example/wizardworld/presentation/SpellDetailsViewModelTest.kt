@@ -50,7 +50,7 @@ class SpellDetailsViewModelTest : TestCase() {
             })
             viewModel.getSpellDetails(id)
         }
-        assertEquals(spell, viewModel.viewState.value.data?.name)
+        assertEquals(spell, viewModel.viewState.value.result.name)
     }
 
     fun testGetSpellDetailsError() {
@@ -58,7 +58,7 @@ class SpellDetailsViewModelTest : TestCase() {
             coEvery { useCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getSpellDetails(id)
         }
-        assertEquals(errorString, viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.msg)
     }
 
     fun testGetSpellDetailsLoading() {

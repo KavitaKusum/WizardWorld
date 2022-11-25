@@ -5,6 +5,8 @@ data class Wizard(
     val name: String,
     val id: String,
     val elixirs: List<String>
-)
+) {
+    constructor() : this("", "", emptyList())
+}
 
 

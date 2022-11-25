@@ -36,6 +36,7 @@
     <string name="spells_list">Spells list</string>
     <string name="houses_list">Houses list</string>
     <string name="error_text">Api error: %s</string>
+    <string name="error">Error</string>
     <string name="no_specialization">No specialization</string>
     <string name="one_specialization">Specialized in 1 elixir</string>
     <string name="number_specialization">Specialized in %s elixirs</string>

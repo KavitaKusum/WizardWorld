@@ -7,19 +7,15 @@ class ElixirListAPiResponseMapper {
     fun toElixirList(response: List<ElixirDTO>?): List<Triple<String, String, String>> {
         val list = mutableListOf<Triple<String, String, String>>()
         response?.let {
-            for (item in it) {
-                list.add(Triple(item.id, item.name, item.effect))
-            }
+            for (item in it)
+                list.add(Triple(item.id?:"", item.name?:"", item.effect?:""))
         }
         return list
     }
 
     fun toElixir(response: ElixirDTO?): Elixir {
-        return createElixir(response)
-    }
-
-    private fun createElixir(item: ElixirDTO?): Elixir {
-        item?.let {
+        var elixir = Elixir()
+        response?.let {
             val ingredientList = mutableListOf<String>()
             val inventorList = mutableListOf<String>()
             it.ingredients?.let { list ->
@@ -30,7 +26,7 @@ class ElixirListAPiResponseMapper {
                 for (inventor in list)
                     inventorList.add(getInventorFullName(inventor.firstName, inventor.lastName))
             }
-            return Elixir(
+            elixir = Elixir(
                 it.name ?: "",
                 it.id ?: "",
                 it.effect ?: "",
@@ -43,7 +39,7 @@ class ElixirListAPiResponseMapper {
                 ingredientList
             )
         }
-        return Elixir("", "", "", "", "", "", "", "", listOf(), listOf())
+        return elixir
     }
 
     private fun getInventorFullName(firstName: String?, lastName: String?): String {

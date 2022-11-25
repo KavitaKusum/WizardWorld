@@ -41,6 +41,6 @@ class ProductAdapter :
     val differ = AsyncListDiffer(this, differCallback)
 
     interface OnClickListener {
-        fun onClick(productId: Int)
+        fun onClick(choice: Int)
     }
 }

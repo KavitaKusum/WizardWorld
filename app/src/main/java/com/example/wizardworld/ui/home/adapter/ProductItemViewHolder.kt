@@ -1,8 +1,8 @@
 package com.example.wizardworld.ui.home.adapter
 
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wizardworld.domain.model.Product
 import com.example.wizardworld.databinding.ProductsListItemBinding
+import com.example.wizardworld.domain.model.Product
 
 class ProductItemViewHolder(
     private val binding: ProductsListItemBinding,
@@ -15,9 +15,11 @@ class ProductItemViewHolder(
                 onClickListener.onClick(productData.productId)
             }
             productNameTv.text = productData.description
-            if (productData.image!=0) {
-                productImageView.setImageResource(productData.image)
-                productImageView.clipToOutline = true
+            when {
+                productData.image!=0 -> {
+                    productImageView.setImageResource(productData.image)
+                    productImageView.clipToOutline = true
+                }
             }
         }
     }

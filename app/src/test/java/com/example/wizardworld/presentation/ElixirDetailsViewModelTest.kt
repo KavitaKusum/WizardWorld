@@ -51,7 +51,7 @@ class ElixirDetailsViewModelTest : TestCase() {
             })
             viewModel.getElixirDetails(id)
         }
-        assertEquals(elixir, viewModel.viewState.value.data?.name)
+        assertEquals(elixir, viewModel.viewState.value.result.name)
     }
 
     fun testGetElixirDetailsError() {
@@ -59,7 +59,7 @@ class ElixirDetailsViewModelTest : TestCase() {
             coEvery { elixirDetailUseCase.invoke(id) } returns (flow { emit(Result.Error(errorString)) })
             viewModel.getElixirDetails(id)
         }
-        assertEquals(errorString, viewModel.viewState.value.error)
+        assertEquals(errorString, viewModel.viewState.value.msg)
     }
 
     fun testGetElixirDetailsLoading() {

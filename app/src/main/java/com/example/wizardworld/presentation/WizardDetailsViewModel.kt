@@ -14,16 +14,19 @@ import javax.inject.Inject
 @HiltViewModel
 class WizardDetailsViewModel @Inject constructor(private val wizardUseCase: WizardDetailUseCase) :
     ViewModel() {
-    private val _viewState = MutableStateFlow(ViewState<Wizard>(isLoading = true))
+    private val emptyObject = Wizard()
+    private val _viewState = MutableStateFlow<ViewState<Wizard>>(ViewState.Loading(emptyObject))
     val viewState = _viewState.asStateFlow()
     fun getWizardDetails(wizardId: String) {
         viewModelScope.launch {
             wizardUseCase.invoke(wizardId).collect {
                 when (it) {
-                    is Result.Error -> _viewState.value = ViewState(error = it.msg)
-                    is Result.Success -> _viewState.value = ViewState(data = it.result)
-                    is Result.Loading -> _viewState.value =
-                        ViewState(isLoading = true, data = null, error = null)
+                    is Result.Error -> _viewState.value = ViewState.Error(emptyObject, it.msg ?: "")
+                    is Result.Success ->
+                        it.result?.let { list ->
+                            _viewState.value = ViewState.Success(list)
+                        }
+                    is Result.Loading -> _viewState.value = ViewState.Loading(emptyObject)
                 }
             }
         }

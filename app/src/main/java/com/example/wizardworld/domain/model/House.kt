@@ -11,4 +11,6 @@ data class House(
     val commonRoom: String,
     val heads: List<String>,
     val traits: List<String>
-)
+) {
+    constructor() : this("","","","","","","","", emptyList(), emptyList())
+}
